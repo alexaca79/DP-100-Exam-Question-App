@@ -1,28 +1,25 @@
-# About this project
+# DP-100 Exam Study App
 
+> **This is a forked and extended version of the original [DP-100-Exam-Question-App](https://github.com/JhonatanSmith/DP-100-Exam-Question-App) by [@JhonatanSmith](https://github.com/JhonatanSmith). All credit for the original concept, app structure, and question bank goes to them.**
 
-Getting the rifth material to pass a certification could be tiresome. This project is a simple app that allows you to practice your skills in the exam with some questions that i looked for in different platform to face the **DP-100** microsoft certification exam.
+A static web version of this app is available via GitHub Pages — no installation or Streamlit required. Open it on any device, including your phone:
 
-# How to use it
+**[https://shibdad.github.io/DP-100-Exam-Question-App/](https://shibdad.github.io/DP-100-Exam-Question-App/)**
 
+## Additions:
 
-Just clone the repository and run the app with streamlit. Of course, you first need to create an enviroment and install the requirements. To do so, the ``pdm.loc`` file will be a great help.
+- Added a static `index.html` web app for GitHub Pages (mobile-friendly, no server needed)
+- Expanded the question bank with additional practice questions covering SDK v2, MLflow, pipelines, compute, AutoML, deployment, Responsible AI, and more
+- All 5 question types supported: single answer, multi-select, ordering, drag-and-drop select, and true/false
 
-# How to create the questions.json file
+## Streamlit server still supported
 
+```bash
+cd dp-100
+pip install streamlit
+streamlit run app.py
+```
 
-The questions.json file is a json file that contains the questions and their options. Of course, you could cuild your own bank of questions by giving the questions the rigth format and the app will use them. For that reason i decide to use the bank of questions directly from the root of the repository. The file is called ``questions.json``.
+## Original README
 
-Each question has its own format and **its own question id**. In case that a question needs to be changed or even deleted, could be easily tracked with the question id. 
-
-![alt text](/media%20&%20backups/question_id.png)
-
-# General view
-
-A general idea of the app is showed below. Althou i sincerily reccomend you to try out the app and in case you would like to contribute, please feel free to do so.
-
-![App demo](/media%20&%20backups/dp-app.gif)
-
-# Final Comment 
-
-I hope this app will be usefull to help you pass the exam. If that is the case, please follow [My Personal LinkedIn account](https://www.linkedin.com/in/jhsgarciamu/) for more c: and i hope you use and pass the exam!! I wish you bests!
+For details on the original project -- see the [original repository](https://github.com/JhonatanSmith/DP-100-Exam-Question-App).
