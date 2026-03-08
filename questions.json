@@ -4562,7 +4562,7 @@
       },
       {
         "id": "B",
-        "text": "No  \n\n**Correct answer:** A. Yes  \n\n**Explanation:**  \n**Machine Learning compute clusters** are the ideal infrastructure for running pipelines within Designer v2 in Azure Machine Learning. They are scalable and designed for batch or flow training jobs.  \n\n**Reference:**  \n- [Azure ML Compute Targets](https://learn.microsoft.com/en-us/azure/machine-learning/concept-compute-target)\n\n---",
+        "text": "No",
         "is_correct": false,
         "explanation": ""
       }
@@ -4583,7 +4583,7 @@
       },
       {
         "id": "B",
-        "text": "No  \n\n**Correct answer:** B. No  \n\n**Explanation:**  \nAzure Databricks can integrate with Azure ML pipelines, but **it cannot be directly used in Designer v2 as a training target**. Databricks is more suitable for distributed processing with Spark.  \n\n**Reference:**  \n- [What is Designer (v2) in Azure ML?](https://learn.microsoft.com/en-us/azure/machine-learning/concept-designer-overview)\n\n## Case Study 1: Monitoring jobs in Azure Machine Learning",
+        "text": "No",
         "is_correct": true,
         "explanation": "Azure Databricks can integrate with Azure ML pipelines, but **it cannot be directly used in Designer v2 as a training target**. Databricks is more suitable for distributed processing with Spark."
       }
@@ -4604,7 +4604,7 @@
       },
       {
         "id": "B",
-        "text": "No  \n\n**Correct answer:** B. No  \n\n**Explanation:**  \nHDInsight, like Databricks, is based on Apache Spark and can execute Machine Learning jobs, but **it is not compatible as a direct target within Azure ML Designer**. Designer requires dedicated clusters of type **AML compute cluster**.\n\n**Reference:**  \n- [Configure and submit training jobs](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-train-cli)\n\n---\n## Case Study 2: Tracking Metrics and Job Execution in Azure Machine Learning",
+        "text": "No",
         "is_correct": true,
         "explanation": "HDInsight, like Databricks, is based on Apache Spark and can execute Machine Learning jobs, but **it is not compatible as a direct target within Azure ML Designer**. Designer requires dedicated clusters of type **AML compute cluster**."
       }
@@ -4625,7 +4625,7 @@
       },
       {
         "id": "B",
-        "text": "Yes  \n**Correct answer:** B. Yes  \n\n**Explanation:**  \nThe `mlflow.log_metric()` method is the correct way to log metrics (accuracy, loss, etc.). It takes the metric name and its value as arguments and can be used multiple times to capture the evolution during training.\n\n---",
+        "text": "Yes",
         "is_correct": true,
         "explanation": "The `mlflow.log_metric()` method is the correct way to log metrics (accuracy, loss, etc.). It takes the metric name and its value as arguments and can be used multiple times to capture the evolution during training."
       }
@@ -4646,7 +4646,7 @@
       },
       {
         "id": "B",
-        "text": "No  \n\n**Correct answer:** B. No  \n\n**Explanation:**  \n`Run.log()` belongs to the Azure ML SDK, not MLflow. While it allows logging artifacts and values, it is not the appropriate tool when using MLflow as the tracking engine.\n\n**Reference:**  \n- Azure ML SDK Run Class\n\n---",
+        "text": "No",
         "is_correct": true,
         "explanation": "`Run.log()` belongs to the Azure ML SDK, not MLflow. While it allows logging artifacts and values, it is not the appropriate tool when using MLflow as the tracking engine."
       }
@@ -4667,7 +4667,7 @@
       },
       {
         "id": "B",
-        "text": "No  \n\n**Correct answer:** B. No  \n\n**Explanation:**  \n`mlflow.log_param()` is used to log parameters (hyperparameters), not metrics. Since the question requires logging metrics, this option does not meet the goal.\n\n**Reference:**  \n- Logging data to runs in Microsoft documentation (look for it)\n\n---",
+        "text": "No",
         "is_correct": true,
         "explanation": "`mlflow.log_param()` is used to log parameters (hyperparameters), not metrics. Since the question requires logging metrics, this option does not meet the goal."
       }
@@ -4688,7 +4688,7 @@
       },
       {
         "id": "B",
-        "text": "No  \n\n**Correct answer:** A. Yes  \n\n**Explanation:**  \nThe solution meets the goal. Azure CLI ≥ 2.38.0 allows creating local endpoints and deployments using the `--local` flag, which leverages Docker for local testing. YAML files are used to define both the endpoint and the deployment, enabling debugging and real-time scoring locally.  \n\n**Reference:**  \n- [Install and set up the CLI (v2)](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-local-endpoints-cli?view=azureml-api-2) \n\n---",
+        "text": "No",
         "is_correct": false,
         "explanation": ""
       }
@@ -4709,7 +4709,7 @@
       },
       {
         "id": "B",
-        "text": "No  \n  \n**Correct answer:** A. Yes  \n\n**Explanation:**  \nAzure ML SDK v2 allows the creation and testing of local endpoints using the `local=True` parameter, running in a Docker environment. The `ml_client` object manages resources such as endpoints, deployments, and jobs, facilitating local testing and debugging.\n\n**Reference:**  \n- [MLClient Class](https://learn.microsoft.com/en-us/python/api/azure-ai-ml/azure.ai.ml.mlclient)\n\n---",
+        "text": "No",
         "is_correct": false,
         "explanation": ""
       }
@@ -4730,7 +4730,7 @@
       },
       {
         "id": "B",
-        "text": "No  \n\n**Correct answer:** B. No  \n\n**Explanation:**  \nAzure ML Studio does not support configuring or deploying local endpoints. To do so, you must use Azure CLI v2 or the Azure ML Python SDK v2 with the `local=True` parameter, which leverages Docker for local testing.\n\n**Reference:**  \n- [Deploy and score a machine learning model by using an online endpoint](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-local-endpoints-cli)\n\n---",
+        "text": "No",
         "is_correct": true,
         "explanation": "Azure ML Studio does not support configuring or deploying local endpoints. To do so, you must use Azure CLI v2 or the Azure ML Python SDK v2 with the `local=True` parameter, which leverages Docker for local testing."
       }
@@ -4751,7 +4751,7 @@
       },
       {
         "id": "B",
-        "text": "No  \n**Correct answer:** A. Yes  \n**Explanation:**  \nAzure Data Factory enables the creation of pipelines that integrate, transform, and trigger retraining automatically when changes occur in the database. It is ideal for MLOps scenarios with large volumes of data.  \n**Reference:**  \n- Retraining and Updating Azure ML models with Azure Data Factory\n\n---",
+        "text": "No",
         "is_correct": false,
         "explanation": ""
       }
@@ -4784,7 +4784,7 @@
       },
       {
         "id": "D",
-        "text": "mlflow.<flavor>.load_model()  \n**Correct answer:** A. mlflow.pyfunc  \n**Explanation:**  \nThe `mlflow.pyfunc` module allows defining and registering custom models that combine different frameworks. It is not recommended to use `mlflow.autolog()` or `mlflow.log_params()` as they do not handle custom models properly, and `load_model()` is only used to load a model, not to register it.  \n**Reference:**  \n- [mlflow.pyfunc — MLflow Python Functions (pyfunc) Documentation](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html)\n\n---",
+        "text": "mlflow.<flavor>.load_model()",
         "is_correct": false,
         "explanation": ""
       }
@@ -4811,7 +4811,7 @@
       },
       {
         "id": "C",
-        "text": "Create a v2 job with `AssetTypes.URI_FILE` and `ml_client.jobs.create_or_update()`  \n\n**Correct answer:** B. Create a v2 job with `AssetTypes.URI_FOLDER` and `ml_client.jobs.create_or_update()`  \n\n**Explanation:**  \nWhen the Parquet file is in a folder, you must use `AssetTypes.URI_FOLDER` to reference the entire folder as an input resource and then create the job with `ml_client.jobs.create_or_update()`, which sends the folder's contents to the execution environment.  \n\n**Reference:**  \n- [AssetTypes.URI_FOLDER in Azure ML SDK v2](https://learn.microsoft.com/en-us/python/api/azure-ai-ml/azure.ai.ml.constants.assettypes?view=azureml-api-2)  \n- [MLClient.jobs.create_or_update](https://learn.microsoft.com/en-us/python/api/azure-ai-ml/azure.ai.ml.mlclient#azure-ai-ml-mlclient-jobs-create-or-update)  \n\n---",
+        "text": "Create a v2 job with `AssetTypes.URI_FILE` and `ml_client.jobs.create_or_update()`",
         "is_correct": false,
         "explanation": "When the Parquet file is in a folder, you must use `AssetTypes.URI_FOLDER` to reference the entire folder as an input resource and then create the job with `ml_client.jobs.create_or_update()`, which sends the folder's contents to the execution environment."
       }
@@ -4844,7 +4844,7 @@
       },
       {
         "id": "D",
-        "text": "mlflow.<flavor>.load_model()  \n\n**Correct answer:** A. mlflow.pyfunc  \n\n**Explanation:**  \nYou should use the `mlflow.pyfunc` module to log custom models that combine multiple frameworks or inference logic not natively supported by MLflow. This module defines a generic file-system format for Python models and provides utilities to save and load them in that format.  \n\n**Reference:**  \n- [MLflow pyfunc documentation](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html)\n\n---",
+        "text": "mlflow.<flavor>.load_model()",
         "is_correct": false,
         "explanation": ""
       }
@@ -4877,7 +4877,7 @@
       },
       {
         "id": "D",
-        "text": "Create a v2 job using `AssetTypes.URI_FOLDER` and submit with `ml_client.jobs.create_or_update()`  \n\n**Correct answer:** D. Create a v2 job using `AssetTypes.URI_FOLDER` and submit with `ml_client.jobs.create_or_update()`  \n\n**Explanation:**  \n`AssetTypes.URI_FOLDER` is used to reference an entire folder (rather than individual files) as an input or output. In this case, it ensures your Parquet data folder is mounted into the job environment so your script can read and write directly to it.  \n\n**Reference:**  \n- [AssetTypes.URI_FOLDER in Azure ML SDK v2](https://learn.microsoft.com/en-us/python/api/azure-ai-ml/azure.ai.ml.constants.assettypes?view=azureml-api-2)  \n- [MLClient.jobs.create_or_update](https://learn.microsoft.com/en-us/python/api/azure-ai-ml/azure.ai.ml.mlclient#azure-ai-ml-mlclient-jobs-create-or-update)  \n\n---",
+        "text": "Create a v2 job using `AssetTypes.URI_FOLDER` and submit with `ml_client.jobs.create_or_update()`",
         "is_correct": true,
         "explanation": "`AssetTypes.URI_FOLDER` is used to reference an entire folder (rather than individual files) as an input or output. In this case, it ensures your Parquet data folder is mounted into the job environment so your script can read and write directly to it."
       }
@@ -4893,29 +4893,29 @@
       {
         "id": "A",
         "text": "Specify idle seconds before scale down to 0",
-        "is_correct": true,
-        "explanation": "Compute clusters support autoscaling down to zero nodes, so creating a cluster target is required. By setting the minimum number of nodes to 0, the cluster will release all resources when no jobs are running, avoiding charges. It is not recommended to use compute instances for this scenario, and setting `idle_seconds_before_scaledown` to 0 can lead to unnecessary reprovisioning rather than relying on scale-to-zero behavior."
+        "is_correct": false,
+        "explanation": "Setting idle_seconds_before_scaledown to 0 can lead to unnecessary reprovisioning rather than relying on scale-to-zero behavior. This is not the recommended approach."
       },
       {
         "id": "B",
-        "text": "Create an Azure Machine Learning **compute instance** target",
+        "text": "Create an Azure Machine Learning compute instance target",
         "is_correct": false,
-        "explanation": ""
+        "explanation": "Compute instances are always-on and do not scale to zero. They are not suitable for batch jobs where cost should be zero when idle."
       },
       {
         "id": "C",
-        "text": "Create an Azure Machine Learning **compute cluster** target",
+        "text": "Create an Azure Machine Learning compute cluster target",
         "is_correct": true,
-        "explanation": "Compute clusters support autoscaling down to zero nodes, so creating a cluster target is required. By setting the minimum number of nodes to 0, the cluster will release all resources when no jobs are running, avoiding charges. It is not recommended to use compute instances for this scenario, and setting `idle_seconds_before_scaledown` to 0 can lead to unnecessary reprovisioning rather than relying on scale-to-zero behavior."
+        "explanation": "Compute clusters support autoscaling down to zero nodes, making them ideal for batch jobs. The cluster releases all resources when no jobs are running."
       },
       {
         "id": "D",
-        "text": "Specify the minimum number of cluster nodes to 0  \n\n**Correct answers:** C. Create an Azure Machine Learning compute cluster target  \nD. Specify the minimum number of cluster nodes to 0  \n\n**Explanation:**  \nCompute clusters support autoscaling down to zero nodes, so creating a cluster target is required. By setting the minimum number of nodes to 0, the cluster will release all resources when no jobs are running, avoiding charges. It is not recommended to use compute instances for this scenario, and setting `idle_seconds_before_scaledown` to 0 can lead to unnecessary reprovisioning rather than relying on scale-to-zero behavior.\n\n**Reference:**  \n- [Azure ML Compute Targets](https://learn.microsoft.com/en-us/azure/machine-learning/concept-compute-target)  \n- [Configure autoscale for Azure ML compute clusters](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-autoscale-compute-cluster)  \n\n---",
-        "is_correct": false,
-        "explanation": ""
+        "text": "Specify the minimum number of cluster nodes to 0",
+        "is_correct": true,
+        "explanation": "Setting min_instances to 0 ensures the cluster scales down completely when idle, so no compute charges are incurred between jobs."
       }
     ],
-    "feedback": "Compute clusters support autoscaling down to zero nodes, so creating a cluster target is required. By setting the minimum number of nodes to 0, the cluster will release all resources when no jobs are running, avoiding charges. It is not recommended to use compute instances for this scenario, and setting `idle_seconds_before_scaledown` to 0 can lead to unnecessary reprovisioning rather than relying on scale-to-zero behavior.",
+    "feedback": "Use a compute cluster (not a compute instance) and set the minimum node count to 0. This combination ensures the cluster scales to zero between jobs, eliminating idle compute costs.",
     "include_in_bank": true
   },
   {
@@ -4949,7 +4949,7 @@
       },
       {
         "id": "E",
-        "text": "execute(mini_batch)  \n\n**Correct answers:**",
+        "text": "execute(mini_batch)",
         "is_correct": false,
         "explanation": ""
       }
@@ -4982,7 +4982,7 @@
       },
       {
         "id": "D",
-        "text": "`spark.read.format(\"csv\").load(\"wasbs://mycontainer.blob.core.windows.net\")`  \n\n**Correct answer:**  \nB. `spark.read.format(\"parquet\").load(\"wasbs://mycontainer.blob.core.windows.net\")`  \n\n**Explanation:**  \nThe Spark DataFrameReader with `format(\"parquet\")` is the correct method to load columnar Parquet files. It efficiently reads the schema and data layout optimized for Parquet, whereas `text`, `avro`, or `csv` formats would not correctly parse Parquet data.\n\n**Reference:**  \n- [Apache Spark Parquet File Source](https://spark.apache.org/docs/latest/sql-data-sources-parquet.html)  \n- [Use Azure Blob Storage with Azure Synapse Spark](https://learn.microsoft.com/en-us/azure/synapse-analytics/spark/apache-spark-azure-storage-blob)\n\n---",
+        "text": "`spark.read.format(\"csv\").load(\"wasbs://mycontainer.blob.core.windows.net\")`",
         "is_correct": false,
         "explanation": ""
       }
@@ -5015,7 +5015,7 @@
       },
       {
         "id": "D",
-        "text": "Compute instance  \n\n**Correct answer:** C. Inference cluster  \n\n**Explanation:**  \nAn **Inference cluster** is the only Azure ML compute option designed to host real‑time web service endpoints under full Azure management. It provides built‑in autoscaling, high availability, and integration with container orchestration:\n\n- **Azure Kubernetes Service (AKS)**: ideal for production scenarios, offering robust autoscaling, rolling upgrades, and SLA‑backed uptime.  \n- **Azure Container Instances (ACI)**: suited for development and testing or low‑volume endpoints, allowing quick, serverless deployment without cluster management overhead.\n\nOther compute targets do not meet the requirements:  \n- **Compute clusters** (AML compute) are optimized for batch training and pipeline jobs, not for serving live HTTP requests.  \n- **Compute instances** serve as interactive notebooks and development workspaces, lacking the orchestration needed for scalable inference.  \n- **Attached compute** refers to external resources you bring into Azure ML, which you then manage yourself rather than letting Azure handle scaling and availability.\n\nBy choosing an Inference cluster, you gain a fully managed environment that automatically provisions and scales resources, integrates with your CI/CD pipelines, and ensures low‑latency, reliable real‑time scoring.\n\n**References:**  \n- [Deploy a real-time endpoint with Azure ML Designer](https://learn.microsoft.com/en-us/azure/machine-learning/tutorial-designer-automobile-price-deployment)  \n- [Azure ML compute targets overview](https://learn.microsoft.com/en-us/azure/machine-learning/concept-compute-target)  \n- [Configure inference clusters in Azure ML](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-azure-kubernetes-service)",
+        "text": "Compute instance",
         "is_correct": false,
         "explanation": ""
       }
@@ -5042,7 +5042,7 @@
       },
       {
         "id": "C",
-        "text": "Truncation selection ✅  \n\n**Correct answer:** C. Truncation selection  \n\n**Explanation:**  \nThe **Truncation Selection** policy is designed to drop a specified fraction of the poorest trials at each evaluation checkpoint, exactly matching your needs:  \n\n- **Percentage‑based pruning**: You can configure a `truncation_percentage` to define what fraction of the lowest‑performing runs are canceled each time you evaluate (e.g., 20%).  \n- **Immediate interval evaluation**: Setting `evaluation_interval=1` ensures the policy considers every checkpoint rather than skipping intervals.  \n- **Delayed application**: `delay_evaluation=6` lets the first six intervals run fully before any pruning, giving all trials a fair chance to warm up.  \n\nBy contrast:  \n- **Median stopping** cancels runs that fall below the median performance of all active runs. It doesn’t allow you to specify a fixed percentage for pruning and uses a different decision rule.  \n- **Bandit** (Hyperband style) dynamically allocates resources across trials but doesn’t directly map to “cancel X% of worst runs every Y intervals.” It’s focused on bracket‑based resource allocation rather than a simple truncation strategy.  \n\nTherefore, **Truncation Selection** is the only policy that supports both percentage‑based pruning and delayed start as specified.\n\n**References:**  \n- [Early Termination Policies in Azure ML hyperparameter tuning](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-tune-hyperparameters)  \n- [TruncationSelectionPolicy class (SDK v2)](https://learn.microsoft.com/en-us/python/api/azure-ai-ml/azure.ai.ml.sweep.truncationselectionpolicy)  \n📘 [Azure ML Early Termination PoliciesAzure ML Early Termination Policie](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-tune-hyperparameters?view=azureml-api-2)",
+        "text": "Truncation selection ✅",
         "is_correct": true,
         "explanation": "The **Truncation Selection** policy is designed to drop a specified fraction of the poorest trials at each evaluation checkpoint, exactly matching your needs:"
       }
@@ -5075,7 +5075,7 @@
       },
       {
         "id": "D",
-        "text": "Use the storage account’s access key to authenticate and set the `fs.azure.account.key` property.  \n\n\n**Correct answer:**  \nD. Use the storage account’s access key to authenticate and set the `fs.azure.account.key` property.  \n\n**Explanation:**  \nUsing the storage account access key is the simplest secure method for Spark in Azure ML Notebooks. It requires only a single secret, which you can store in Azure Key Vault or as a workspace secret, and avoids the overhead of registering an Azure AD application or handling token lifecycles. Service principals and OAuth configurations demand managing client IDs, secrets, tenant IDs, and often custom token‑refresh logic. SAS tokens introduce separate expiration and permission management. By contrast, the account key approach lets Spark authenticate directly to ADLS Gen2 with minimal setup while still allowing you to rotate the key centrally.\n\nLa opción correcta es usar la **clave de acceso (Access Key)** de la cuenta de almacenamiento para autenticarse en Spark y configurar la propiedad:\n\n```python\nsc._jsc.hadoopConfiguration().set(\n    \"fs.azure.account.key.<STORAGE_ACCOUNT_NAME>.dfs.core.windows.net\",\n    \"<ACCESS_KEY>\"\n)\n```\nThis authentication method:\n\n- Is secure and straightforward.\n- Does not require configuring multiple credentials or external tokens.\n- Is ideal if you want to avoid the complexity of managing OAuth, service principals, or SAS tokens.\n\nWhy the other options are ruled out:\n❌ Service Principal with OAuth: Involves managing client ID, secret, and tenant ID, which requires more setup, key rotation, and regular maintenance.\n\n❌ OAuth (fs.azure.account.auth.type): Requires additional configuration and is more complex for basic scenarios.\n\n❌ SAS Token: While secure, it requires managing tokens with permissions and expirations, adding unnecessary complexity.\n\n\n**References:**  \n- [Authenticate Spark with ADLS Gen2 using account key](https://learn.microsoft.com/azure/storage/blobs/data-lake-storage-configure-spark)  \n- [Azure Machine Learning secrets management](https://learn.microsoft.com/azure/machine-learning/how-to-get-azure-key-vault-secrets)",
+        "text": "Use the storage account’s access key to authenticate and set the `fs.azure.account.key` property.",
         "is_correct": true,
         "explanation": "Using the storage account access key is the simplest secure method for Spark in Azure ML Notebooks. It requires only a single secret, which you can store in Azure Key Vault or as a workspace secret, and avoids the overhead of registering an Azure AD application or handling token lifecycles. Service principals and OAuth configurations demand managing client IDs, secrets, tenant IDs, and often custom token‑refresh logic. SAS tokens introduce separate expiration and permission management. By contrast, the account key approach lets Spark authenticate directly to ADLS Gen2 with minimal setup while still allowing you to rotate the key centrally."
       }
@@ -5108,7 +5108,7 @@
       },
       {
         "id": "D",
-        "text": "Azure Database for PostgreSQL  \n\n**Correct answer:** D. Azure Database for PostgreSQL  \n\n**Explanation:**  \nAzure ML Studio allows you to register various storage services as datastores. For **relational** data, you must choose a supported relational database service—Azure Database for PostgreSQL—rather than file‑based storage like Blob or ADLS Gen2, which are designed for unstructured or semi‑structured files, not relational tables.\n\n**Reference:**  \n- [Datastore module documentation](https://learn.microsoft.com/en-us/python/api/azureml-core/azureml.core.datastore.datastore?view=azure-ml-py)",
+        "text": "Azure Database for PostgreSQL",
         "is_correct": true,
         "explanation": "Azure ML Studio allows you to register various storage services as datastores. For **relational** data, you must choose a supported relational database service—Azure Database for PostgreSQL—rather than file‑based storage like Blob or ADLS Gen2, which are designed for unstructured or semi‑structured files, not relational tables."
       }
@@ -5135,7 +5135,7 @@
       },
       {
         "id": "C",
-        "text": "`az ml workspace sync-keys`  \n\n**Correct answer:** C. `az ml workspace sync-keys`  \n\n**Explanation:**  \nWhen you regenerate the access keys of the storage account linked to an Azure ML Workspace, the workspace loses its ability to access blobs and files. The `az ml workspace sync-keys` command pushes the new keys into the workspace metadata, restoring its access. Without running `sync-keys`, the workspace continues using the old credentials and will fail on any storage operations.\n\n\nPara resolver esto, se debe usar el comando:\n\n```bash\naz ml workspace sync-keys \\\n  --name <workspace-name> \\\n  --resource-group <resource-group-name>\n```\nThis command synchronizes the updated keys of the associated storage resource (such as Azure Blob or ADLS Gen2) with the Azure ML Workspace.  \nThis is essential to avoid interruptions in the execution of notebooks, experiments, or pipelines that depend on the storage.\n\n🔒 **Important:**  \nRegenerating the key in the resource is not enough; the workspace must be explicitly updated with these new credentials using `sync-keys`.\n\n\n**Reference:**  \n- [az ml workspace sync-keys](https://learn.microsoft.com/en-us/cli/azure/ml/workspace?view=azure-cli-latest#az-ml-workspace-sync-keys)",
+        "text": "`az ml workspace sync-keys`",
         "is_correct": true,
         "explanation": "When you regenerate the access keys of the storage account linked to an Azure ML Workspace, the workspace loses its ability to access blobs and files. The `az ml workspace sync-keys` command pushes the new keys into the workspace metadata, restoring its access. Without running `sync-keys`, the workspace continues using the old credentials and will fail on any storage operations."
       }
@@ -5168,7 +5168,7 @@
       },
       {
         "id": "D",
-        "text": "Add the file name to the labels dataset.  \n\n**Correct answer:** B. Export data labels to the COCO file format.  \n\n**Explanation:**  \nThe COCO format captures both the image references (filenames or URIs) and their associated labels in a single JSON file. It’s widely supported by tools like PyTorch, TorchVision and can be easily converted into a pandas DataFrame or other tabular view without manual file renaming or editing.  \n\n**References:**  \n- [Labeling images and text documents in Azure ML](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-label-data)  \n- [Create and explore labeled datasets](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-labeling-projects)  \n\n---",
+        "text": "Add the file name to the labels dataset.",
         "is_correct": false,
         "explanation": ""
       }
@@ -5201,7 +5201,7 @@
       },
       {
         "id": "D",
-        "text": "Azure Machine Learning compute clusters  \n\n**Correct answers:**",
+        "text": "Azure Machine Learning compute clusters",
         "is_correct": false,
         "explanation": ""
       }
@@ -5234,7 +5234,7 @@
       },
       {
         "id": "D",
-        "text": "Bayesian sampling  \n\n**Correct answer:** D. Bayesian sampling  \n\n**Explanation:**  \nBayesian sampling maintains a probabilistic model of the objective function and uses past evaluation results to guide the search toward promising regions (exploitation) while still exploring untested areas (exploration). This results in more efficient hyperparameter searches compared to exhaustive grid sampling or naive random sampling. Gradient‑based methods optimize model parameters during training and are not designed for hyperparameter search.  \n\n**References:**  \n- [Hyperparameter tuning a model (v2)](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-tune-hyperparameters-v2)  \n- [Bayesian optimization overview](https://en.wikipedia.org/wiki/Bayesian_optimization)",
+        "text": "Bayesian sampling",
         "is_correct": true,
         "explanation": "Bayesian sampling maintains a probabilistic model of the objective function and uses past evaluation results to guide the search toward promising regions (exploitation) while still exploring untested areas (exploration). This results in more efficient hyperparameter searches compared to exhaustive grid sampling or naive random sampling. Gradient‑based methods optimize model parameters during training and are not designed for hyperparameter search."
       }
@@ -5267,7 +5267,7 @@
       },
       {
         "id": "D",
-        "text": "Specify the columns to be cleaned in the Clean Missing Data component.  \n\n**Correct answer:**  \nB. Use the Select Columns in Dataset component to choose a column.  \n\n**Explanation:**  \nYour pipeline failed because you did not explicitly select any columns for the component to operate on. The “Select Columns in Dataset” component must be told which column(s) to include; without that, it throws “a value is required.” By using this component to choose at least one column, you satisfy the requirement and prevent the error.  \n\n**Reference:**  \n- [Select Columns in Dataset component](https://learn.microsoft.com/en-us/azure/machine-learning/component-reference/select-columns-in-dataset)\n\n---",
+        "text": "Specify the columns to be cleaned in the Clean Missing Data component.",
         "is_correct": true,
         "explanation": "Your pipeline failed because you did not explicitly select any columns for the component to operate on. The “Select Columns in Dataset” component must be told which column(s) to include; without that, it throws “a value is required.” By using this component to choose at least one column, you satisfy the requirement and prevent the error."
       }
@@ -5333,7 +5333,7 @@
       },
       {
         "id": "D",
-        "text": "Deploy Azure Databricks as a compute target.  \n\n**Correct answer:**  \nA. Deploy an Azure Machine Learning compute cluster.  \n\n**Explanation:**  \nAn Azure ML compute cluster provides elastic scaling across multiple nodes and is fully integrated with AutoML, pipeline orchestration, and the drag‑and‑drop Designer experience. Local SDK installations and remote VMs lack seamless workspace integration and scalability, while Databricks is not supported by the Designer UI.  \n\n**References:**  \n- [Compute targets in Azure Machine Learning](https://learn.microsoft.com/en-us/azure/machine-learning/concept-compute-target)  \n- [Create and attach a compute cluster](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-attach-compute-cluster)",
+        "text": "Deploy Azure Databricks as a compute target.",
         "is_correct": false,
         "explanation": ""
       }
@@ -5366,7 +5366,7 @@
       },
       {
         "id": "D",
-        "text": "Truncation selection policy  \n\n**Correct answer:**  \nD. Truncation selection policy  \n\n**Explanation:**  \nThe Truncation Selection policy is designed to drop a fixed percentage of the worst‑performing trials at each evaluation checkpoint, exactly matching the requirement to terminate 30 % of runs. It supports parameters such as `truncation_percentage`, `evaluation_interval`, and `delay_evaluation`. In contrast, the Bandit policy uses a slack factor rather than a fixed percentage, the Median Stopping policy cancels runs below the median without a configurable percentage, and choosing no termination policy would allow all runs to complete regardless of performance.\n\n**Reference:**  \n- [HyperDrive early termination policies](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-tune-hyperparameters#early-termination-policies)",
+        "text": "Truncation selection policy",
         "is_correct": true,
         "explanation": "The Truncation Selection policy is designed to drop a fixed percentage of the worst‑performing trials at each evaluation checkpoint, exactly matching the requirement to terminate 30 % of runs. It supports parameters such as `truncation_percentage`, `evaluation_interval`, and `delay_evaluation`. In contrast, the Bandit policy uses a slack factor rather than a fixed percentage, the Median Stopping policy cancels runs below the median without a configurable percentage, and choosing no termination policy would allow all runs to complete regardless of performance."
       }
@@ -5411,7 +5411,7 @@
       },
       {
         "id": "F",
-        "text": "`replication_type`  \n\n**Correct answers:**",
+        "text": "`replication_type`",
         "is_correct": true,
         "explanation": "- **`storage_account_hns: False`** disables Hierarchical Namespace (HNS). HNS is required for directory‑style operations in Data Lake Storage Gen2; turning it off is appropriate when you do not need a hierarchical file structure in your registry."
       }
