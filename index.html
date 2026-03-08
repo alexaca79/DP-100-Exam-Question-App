@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DP-100 Study App</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161922;
+    --surface2: #1e2330;
+    --border: #2a3045;
+    --accent: #00d4ff;
+    --accent2: #7c5cfc;
+    --green: #00e5a0;
+    --red: #ff4d6a;
+    --yellow: #ffd166;
+    --text: #e8ecf5;
+    --text-dim: #7a8299;
+    --text-muted: #4a5268;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: var(--mono); font-size: 13px; color: var(--accent); letter-spacing: 0.05em; }
+  .logo span { color: var(--text-dim); }
+  .score-badge { font-family: var(--mono); font-size: 12px; color: var(--text-dim); background: var(--surface2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
+  .score-badge b { color: var(--green); }
+  .progress-wrap { height: 3px; background: var(--surface2); position: sticky; top: 53px; z-index: 99; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 0.4s ease; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 80px; }
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .filter-btn { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; animation: slideIn 0.25s ease; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .card-header { padding: 16px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .q-number { font-family: var(--mono); font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+  .type-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; flex-shrink: 0; }
+  .type-tag.mc    { background: #1a2a3a; color: var(--accent); border: 1px solid #1e3d55; }
+  .type-tag.multi { background: #1e1a3a; color: var(--accent2); border: 1px solid #2e2560; }
+  .type-tag.order { background: #1a2e22; color: var(--green); border: 1px solid #1e4030; }
+  .type-tag.drag  { background: #2e251a; color: var(--yellow); border: 1px solid #4a3820; }
+  .type-tag.tf    { background: #2e1a1a; color: var(--red); border: 1px solid #4a2020; }
+  .card-body { padding: 20px; }
+  .question-text { font-size: 15px; font-weight: 400; color: var(--text); line-height: 1.65; margin-bottom: 20px; white-space: pre-wrap; }
+  .instruction { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 14px; opacity: 0.8; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option-btn { display: flex; align-items: flex-start; gap: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 13px 15px; cursor: pointer; text-align: left; color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.5; transition: all 0.15s; width: 100%; }
+  .option-btn:hover:not(:disabled) { border-color: var(--accent); background: #1a2535; }
+  .option-btn:disabled { cursor: default; }
+  .option-btn .opt-id { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; margin-top: 1px; min-width: 18px; }
+  .option-btn.selected  { border-color: var(--accent2); background: #1e1a35; }
+  .option-btn.correct   { border-color: var(--green) !important; background: #0d2a1e !important; }
+  .option-btn.incorrect { border-color: var(--red) !important; background: #2a0d12 !important; }
+  .option-btn.correct .opt-id   { color: var(--green); }
+  .option-btn.incorrect .opt-id { color: var(--red); }
+  .order-container { display: flex; flex-direction: column; gap: 8px; }
+  .order-item { display: flex; align-items: center; gap: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 12px 14px; cursor: grab; user-select: none; transition: all 0.15s; }
+  .order-item:active { cursor: grabbing; }
+  .order-item.dragging  { opacity: 0.4; }
+  .order-item.drag-over { border-color: var(--accent); background: #1a2535; }
+  .order-item.correct-pos { border-color: var(--green); background: #0d2a1e; }
+  .order-item.wrong-pos   { border-color: var(--red);   background: #2a0d12; }
+  .order-handle { color: var(--text-muted); font-size: 16px; flex-shrink: 0; }
+  .order-num { font-family: var(--mono); font-size: 11px; color: var(--text-muted); flex-shrink: 0; min-width: 20px; }
+  .order-text { font-size: 14px; line-height: 1.5; }
+  .drag-select-grid { display: flex; flex-direction: column; gap: 8px; }
+  .submit-wrap { margin-top: 20px; }
+  .btn-submit { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: white; border: none; border-radius: 7px; padding: 13px 28px; font-family: var(--mono); font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.04em; transition: opacity 0.15s, transform 0.1s; width: 100%; }
+  .btn-submit:hover { opacity: 0.9; }
+  .btn-submit:active { transform: scale(0.99); }
+  .btn-submit:disabled { opacity: 0.4; cursor: default; }
+  .feedback-box { margin-top: 16px; padding: 14px 16px; border-radius: 7px; font-size: 14px; line-height: 1.6; display: none; }
+  .feedback-box.show { display: block; animation: fadeIn 0.2s ease; }
+  .feedback-box.correct-fb   { background: #0d2a1e; border: 1px solid var(--green); color: #7fffd4; }
+  .feedback-box.incorrect-fb { background: #2a0d12; border: 1px solid var(--red);   color: #ffb3be; }
+  .feedback-label { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+  .correct-fb .feedback-label   { color: var(--green); }
+  .incorrect-fb .feedback-label { color: var(--red); }
+  .explanation-box { margin-top: 10px; padding: 12px 14px; background: #0a0d14; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; color: var(--text-dim); line-height: 1.6; display: none; }
+  .explanation-box.show { display: block; }
+  .btn-next { margin-top: 12px; background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 11px 24px; font-family: var(--mono); font-size: 12px; cursor: pointer; width: 100%; letter-spacing: 0.04em; transition: all 0.15s; display: none; }
+  .btn-next.show { display: block; }
+  .btn-next:hover { border-color: var(--accent); color: var(--accent); }
+  #results-screen { display: none; text-align: center; padding: 40px 20px; animation: slideIn 0.3s ease; }
+  .results-score { font-family: var(--mono); font-size: 64px; font-weight: 600; background: linear-gradient(135deg, var(--accent2), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 8px; }
+  .results-label { font-family: var(--mono); font-size: 13px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 32px; }
+  .results-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 12px; }
+  .stat-num { font-family: var(--mono); font-size: 28px; font-weight: 600; margin-bottom: 4px; }
+  .stat-num.green  { color: var(--green); }
+  .stat-num.red    { color: var(--red); }
+  .stat-num.yellow { color: var(--yellow); }
+  .stat-label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .btn-restart { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: white; border: none; border-radius: 7px; padding: 14px 36px; font-family: var(--mono); font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.05em; transition: opacity 0.15s; margin: 8px; }
+  .btn-restart:hover { opacity: 0.9; }
+  .btn-restart-wrong { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 14px 36px; font-family: var(--mono); font-size: 13px; cursor: pointer; letter-spacing: 0.05em; transition: all 0.15s; margin: 8px; }
+  .btn-restart-wrong:hover { border-color: var(--red); color: var(--red); }
+  #loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; }
+  .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .load-text { font-family: var(--mono); font-size: 12px; color: var(--text-muted); letter-spacing: 0.05em; }
+  @media (max-width: 480px) {
+    .results-score { font-size: 48px; }
+    .results-stats { gap: 8px; }
+    .stat-num { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">DP<span>-100</span> STUDY</div>
+  <div class="score-badge" id="score-badge">0 / 0</div>
+</header>
+<div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+<main>
+  <div id="loading">
+    <div class="spinner"></div>
+    <div class="load-text">loading questions...</div>
+  </div>
+  <div id="quiz-screen" style="display:none">
+    <div class="filter-bar" id="filter-bar"></div>
+    <div id="question-area"></div>
+  </div>
+  <div id="results-screen">
+    <div class="results-score" id="results-pct">0%</div>
+    <div class="results-label">Session Complete</div>
+    <div class="results-stats">
+      <div class="stat-card"><div class="stat-num green"  id="res-correct">0</div><div class="stat-label">Correct</div></div>
+      <div class="stat-card"><div class="stat-num red"    id="res-wrong">0</div><div class="stat-label">Wrong</div></div>
+      <div class="stat-card"><div class="stat-num yellow" id="res-total">0</div><div class="stat-label">Total</div></div>
+    </div>
+    <div>
+      <button class="btn-restart"       onclick="restartQuiz(false)">&#8634; New Session</button>
+      <button class="btn-restart-wrong" onclick="restartQuiz(true)">&#10005; Retry Wrong Only</button>
+    </div>
+  </div>
+</main>
+<script>
+let allQuestions=[], sessionQuestions=[], currentIndex=0, score=0, answered=0, wrongIds=[], activeFilter='all', selectedOptions=new Set(), currentOrder=[], dragSrcIdx=null;
+const TYPES={multiple_choice_single_answer:{label:'Single',cls:'mc'},multiple_choice_multiple_answer:{label:'Multi',cls:'multi'},ordering:{label:'Order',cls:'order'},drag_and_drop_ordering:{label:'Select',cls:'drag'},true_false:{label:'T/F',cls:'tf'}};
+
+fetch('questions.json').then(r=>r.json()).then(data=>{
+  allQuestions=shuffle(data);
+  document.getElementById('loading').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  buildFilters(); startSession();
+}).catch(err=>{
+  document.getElementById('loading').innerHTML=`<div class="load-text" style="color:var(--red)">Error loading questions.json<br>${err.message}</div>`;
+});
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function buildFilters(){
+  const bar=document.getElementById('filter-bar');
+  const c={all:allQuestions.length};
+  allQuestions.forEach(q=>{c[q.type]=(c[q.type]||0)+1;});
+  const f=[
+    {k:'all',l:`ALL (${c.all})`},
+    {k:'multiple_choice_single_answer',l:`SINGLE (${c.multiple_choice_single_answer||0})`},
+    {k:'multiple_choice_multiple_answer',l:`MULTI (${c.multiple_choice_multiple_answer||0})`},
+    {k:'ordering',l:`ORDER (${c.ordering||0})`},
+    {k:'drag_and_drop_ordering',l:`SELECT (${c.drag_and_drop_ordering||0})`},
+    {k:'true_false',l:`T/F (${c.true_false||0})`}
+  ];
+  bar.innerHTML=f.map(x=>`<button class="filter-btn ${x.k===activeFilter?'active':''}" onclick="setFilter('${x.k}')">${x.l}</button>`).join('');
+}
+
+function setFilter(t){activeFilter=t;buildFilters();startSession();}
+
+function startSession(){
+  const pool=activeFilter==='all'?allQuestions:allQuestions.filter(q=>q.type===activeFilter);
+  sessionQuestions=shuffle(pool); currentIndex=0; score=0; answered=0; wrongIds=[];
+  updateBadge();
+  document.getElementById('results-screen').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  render();
+}
+
+function restartQuiz(wrongOnly){
+  if(wrongOnly&&wrongIds.length>0){sessionQuestions=shuffle(allQuestions.filter(q=>wrongIds.includes(q.question_id)));}
+  else{const pool=activeFilter==='all'?allQuestions:allQuestions.filter(q=>q.type===activeFilter);sessionQuestions=shuffle(pool);}
+  currentIndex=0;score=0;answered=0;wrongIds=[];updateBadge();
+  document.getElementById('results-screen').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  render();
+}
+
+function updateBadge(){document.getElementById('score-badge').innerHTML=`<b>${score}</b> / ${answered}`;}
+function updateProgress(){const p=sessionQuestions.length?(currentIndex/sessionQuestions.length)*100:0;document.getElementById('progress-fill').style.width=p+'%';}
+
+function render(){
+  if(currentIndex>=sessionQuestions.length){showResults();return;}
+  updateProgress(); selectedOptions=new Set();
+  const q=sessionQuestions[currentIndex];
+  const ti=TYPES[q.type]||{label:q.type,cls:'mc'};
+  let oHTML='',iHTML='';
+  if(q.type==='multiple_choice_single_answer'||q.type==='true_false'){
+    iHTML=`<div class="instruction">// Select one answer</div>`;
+    oHTML=`<div class="options">${q.options.map(o=>`<button class="option-btn" onclick="pickOne(this,'${o.id}')" data-id="${o.id}"><span class="opt-id">${o.id}</span><span>${esc(o.text)}</span></button>`).join('')}</div>`;
+  } else if(q.type==='multiple_choice_multiple_answer'){
+    iHTML=`<div class="instruction">// Select ALL that apply &mdash; then submit</div>`;
+    oHTML=`<div class="options">${q.options.map(o=>`<button class="option-btn" onclick="toggleM(this,'${o.id}')" data-id="${o.id}"><span class="opt-id">${o.id}</span><span>${esc(o.text)}</span></button>`).join('')}</div><div class="submit-wrap"><button class="btn-submit" id="submit-btn" onclick="submitMulti()">CHECK ANSWER</button></div>`;
+  } else if(q.type==='ordering'){
+    iHTML=`<div class="instruction">// Drag to arrange in correct order &mdash; then submit</div>`;
+    currentOrder=shuffle(q.options.map(o=>o.id));
+    oHTML=buildOrderHTML(q)+`<div class="submit-wrap"><button class="btn-submit" id="submit-btn" onclick="submitOrder()">CHECK ORDER</button></div>`;
+  } else if(q.type==='drag_and_drop_ordering'){
+    iHTML=`<div class="instruction">// Select all correct options &mdash; then submit</div>`;
+    oHTML=`<div class="drag-select-grid">${shuffle(q.options).map(o=>`<button class="option-btn" onclick="toggleM(this,'${o.id}')" data-id="${o.id}"><span class="opt-id">${o.id}</span><span>${esc(o.text)}</span></button>`).join('')}</div><div class="submit-wrap"><button class="btn-submit" id="submit-btn" onclick="submitDrag()">CHECK ANSWER</button></div>`;
+  }
+  document.getElementById('question-area').innerHTML=`<div class="card"><div class="card-header"><span class="q-number">${currentIndex+1} / ${sessionQuestions.length}</span><span class="type-tag ${ti.cls}">${ti.label}</span></div><div class="card-body"><div class="question-text">${esc(q.question)}</div>${iHTML}${oHTML}<div class="feedback-box" id="fb"><div class="feedback-label" id="fb-label"></div><div id="fb-text"></div><div class="explanation-box" id="exp-box"></div></div><button class="btn-next" id="btn-next" onclick="nextQ()">NEXT QUESTION &#8594;</button></div></div>`;
+  if(q.type==='ordering') initDrag();
+}
+
+function pickOne(btn,id){
+  const q=sessionQuestions[currentIndex];
+  document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
+  const correct=q.options.find(o=>o.is_correct);
+  const ok=correct&&correct.id===id;
+  document.querySelectorAll('.option-btn').forEach(b=>{
+    const bid=b.getAttribute('data-id'), opt=q.options.find(o=>o.id===bid);
+    if(opt&&opt.is_correct) b.classList.add('correct');
+    else if(bid===id) b.classList.add('incorrect');
+  });
+  record(ok,q); feedback(ok,q.feedback,q.options.find(o=>o.id===id)?.explanation);
+}
+
+function toggleM(btn,id){
+  if(btn.disabled)return;
+  if(selectedOptions.has(id)){selectedOptions.delete(id);btn.classList.remove('selected');}
+  else{selectedOptions.add(id);btn.classList.add('selected');}
+}
+
+function submitMulti(){
+  const q=sessionQuestions[currentIndex];
+  const cids=new Set(q.options.filter(o=>o.is_correct).map(o=>o.id));
+  const ok=setsEq(selectedOptions,cids);
+  document.querySelectorAll('.option-btn').forEach(b=>{b.disabled=true;const bid=b.getAttribute('data-id');if(cids.has(bid))b.classList.add('correct');else if(selectedOptions.has(bid))b.classList.add('incorrect');});
+  document.getElementById('submit-btn').disabled=true;
+  record(ok,q); feedback(ok,q.feedback);
+}
+
+function submitDrag(){
+  const q=sessionQuestions[currentIndex];
+  const cids=new Set(q.correct_order);
+  const ok=setsEq(selectedOptions,cids);
+  document.querySelectorAll('.option-btn').forEach(b=>{b.disabled=true;const bid=b.getAttribute('data-id');if(cids.has(bid))b.classList.add('correct');else if(selectedOptions.has(bid))b.classList.add('incorrect');});
+  document.getElementById('submit-btn').disabled=true;
+  record(ok,q); feedback(ok,q.feedback);
+}
+
+function buildOrderHTML(q){
+  const m={};q.options.forEach(o=>m[o.id]=o.text);
+  return `<div class="order-container" id="order-list">${currentOrder.map((id,i)=>`<div class="order-item" draggable="true" data-idx="${i}" data-id="${id}"><span class="order-handle">&#8943;</span><span class="order-num">${i+1}</span><span class="order-text">${esc(m[id]||id)}</span></div>`).join('')}</div>`;
+}
+
+function initDrag(){
+  const list=document.getElementById('order-list');
+  if(!list)return;
+  list.addEventListener('dragstart',e=>{const it=e.target.closest('.order-item');if(!it)return;dragSrcIdx=+it.dataset.idx;setTimeout(()=>it.classList.add('dragging'),0);});
+  list.addEventListener('dragend',e=>{const it=e.target.closest('.order-item');if(it)it.classList.remove('dragging');list.querySelectorAll('.order-item').forEach(i=>i.classList.remove('drag-over'));});
+  list.addEventListener('dragover',e=>{e.preventDefault();const it=e.target.closest('.order-item');if(!it)return;list.querySelectorAll('.order-item').forEach(i=>i.classList.remove('drag-over'));it.classList.add('drag-over');});
+  list.addEventListener('drop',e=>{
+    e.preventDefault();const it=e.target.closest('.order-item');if(!it)return;
+    const di=+it.dataset.idx;if(dragSrcIdx===di)return;
+    [currentOrder[dragSrcIdx],currentOrder[di]]=[currentOrder[di],currentOrder[dragSrcIdx]];
+    const q=sessionQuestions[currentIndex],m={};q.options.forEach(o=>m[o.id]=o.text);
+    list.innerHTML=currentOrder.map((id,i)=>`<div class="order-item" draggable="true" data-idx="${i}" data-id="${id}"><span class="order-handle">&#8943;</span><span class="order-num">${i+1}</span><span class="order-text">${esc(m[id]||id)}</span></div>`).join('');
+    initDrag();
+  });
+  let tsi=null;
+  list.querySelectorAll('.order-item').forEach(item=>{
+    item.addEventListener('touchstart',e=>{tsi=+item.dataset.idx;item.classList.add('dragging');},{passive:true});
+    item.addEventListener('touchend',e=>{
+      item.classList.remove('dragging');
+      const t=e.changedTouches[0],el=document.elementFromPoint(t.clientX,t.clientY),dest=el&&el.closest('.order-item');
+      if(dest&&tsi!==null){
+        const di=+dest.dataset.idx;
+        if(tsi!==di){
+          [currentOrder[tsi],currentOrder[di]]=[currentOrder[di],currentOrder[tsi]];
+          const q=sessionQuestions[currentIndex],m={};q.options.forEach(o=>m[o.id]=o.text);
+          list.innerHTML=currentOrder.map((id,i)=>`<div class="order-item" draggable="true" data-idx="${i}" data-id="${id}"><span class="order-handle">&#8943;</span><span class="order-num">${i+1}</span><span class="order-text">${esc(m[id]||id)}</span></div>`).join('');
+          initDrag();
+        }
+      }
+      tsi=null;
+    });
+  });
+}
+
+function submitOrder(){
+  const q=sessionQuestions[currentIndex];
+  const ok=JSON.stringify(currentOrder)===JSON.stringify(q.correct_order);
+  document.querySelectorAll('.order-item').forEach((item,i)=>{
+    item.setAttribute('draggable','false');item.style.cursor='default';
+    item.classList.add(currentOrder[i]===q.correct_order[i]?'correct-pos':'wrong-pos');
+  });
+  document.getElementById('submit-btn').disabled=true;
+  record(ok,q); feedback(ok,q.feedback);
+}
+
+function feedback(ok,txt,exp){
+  const box=document.getElementById('fb'),lbl=document.getElementById('fb-label'),t=document.getElementById('fb-text'),eb=document.getElementById('exp-box');
+  box.className=`feedback-box show ${ok?'correct-fb':'incorrect-fb'}`;
+  lbl.textContent=ok?'✓ Correct':'✗ Incorrect';
+  t.textContent=txt||'';
+  if(exp){eb.textContent=exp;eb.classList.add('show');}
+  document.getElementById('btn-next').classList.add('show');
+  window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+}
+
+function record(ok,q){answered++;if(ok)score++;else wrongIds.push(q.question_id);updateBadge();}
+function nextQ(){currentIndex++;render();window.scrollTo({top:0,behavior:'smooth'});}
+
+function showResults(){
+  document.getElementById('quiz-screen').style.display='none';
+  const p=answered?Math.round((score/answered)*100):0;
+  document.getElementById('results-pct').textContent=p+'%';
+  document.getElementById('res-correct').textContent=score;
+  document.getElementById('res-wrong').textContent=answered-score;
+  document.getElementById('res-total').textContent=answered;
+  document.getElementById('results-screen').style.display='block';
+  document.getElementById('progress-fill').style.width='100%';
+}
+
+function setsEq(a,b){if(a.size!==b.size)return false;for(const x of a)if(!b.has(x))return false;return true;}
+function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
