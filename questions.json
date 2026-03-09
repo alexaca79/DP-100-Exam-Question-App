@@ -4552,7 +4552,7 @@
   {
     "question_id": "q_003",
     "type": "multiple_choice_multiple_answer",
-    "question": "You need to create a compute instance that would support running ML pipeline training using the Azure Machine Learning designer v2.",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou need to create a compute instance that would support running ML pipeline training using the Azure Machine Learning designer v2.",
     "options": [
       {
         "id": "A",
@@ -4573,7 +4573,7 @@
   {
     "question_id": "q_004",
     "type": "multiple_choice_multiple_answer",
-    "question": "You need to create a compute instance that would support running ML pipeline training using the Azure Machine Learning designer v2.",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou need to create a compute instance that would support running ML pipeline training using the Azure Machine Learning designer v2.",
     "options": [
       {
         "id": "A",
@@ -4594,7 +4594,7 @@
   {
     "question_id": "q_005",
     "type": "multiple_choice_multiple_answer",
-    "question": "You need to create a compute instance that would support running ML pipeline training using the Azure Machine Learning designer v2.",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou need to create a compute instance that would support running ML pipeline training using the Azure Machine Learning designer v2.",
     "options": [
       {
         "id": "A",
@@ -4615,7 +4615,7 @@
   {
     "question_id": "q_006",
     "type": "multiple_choice_multiple_answer",
-    "question": "You need to log metrics data from your job runs using MLflow.",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou need to log metrics data from your job runs using MLflow.",
     "options": [
       {
         "id": "A",
@@ -4636,7 +4636,7 @@
   {
     "question_id": "q_007",
     "type": "multiple_choice_multiple_answer",
-    "question": "You need to log data from your job runs using MLflow.",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou need to log data from your job runs using MLflow.",
     "options": [
       {
         "id": "A",
@@ -4657,7 +4657,7 @@
   {
     "question_id": "q_008",
     "type": "multiple_choice_multiple_answer",
-    "question": "You need to log data from your job runs using MLflow.",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou need to log data from your job runs using MLflow.",
     "options": [
       {
         "id": "A",
@@ -4678,7 +4678,7 @@
   {
     "question_id": "q_009",
     "type": "multiple_choice_multiple_answer",
-    "question": "You want to perform real-time scoring of the ML model and to deploy and debug locally by using local endpoints. You need to create a deployment named `mydep` under the local endpoint.",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou want to perform real-time scoring of the ML model and to deploy and debug locally by using local endpoints. You need to create a deployment named `mydep` under the local endpoint.",
     "options": [
       {
         "id": "A",
@@ -4699,7 +4699,7 @@
   {
     "question_id": "q_010",
     "type": "multiple_choice_multiple_answer",
-    "question": "You want to perform real-time scoring of the ML model and to deploy and debug locally by using local endpoints. You need to create a deployment named `mydep` under the local endpoint. You use Azure ML Python SDK v2 with the following:",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou want to perform real-time scoring of the ML model and to deploy and debug locally by using local endpoints. You need to create a deployment named `mydep` under the local endpoint. You use Azure ML Python SDK v2 with the following:",
     "options": [
       {
         "id": "A",
@@ -4720,7 +4720,7 @@
   {
     "question_id": "q_011",
     "type": "multiple_choice_multiple_answer",
-    "question": "You want to perform real-time scoring of the ML model and to deploy and debug locally by using local endpoints. You need to create a deployment named `mydep` under the local endpoint.",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou want to perform real-time scoring of the ML model and to deploy and debug locally by using local endpoints. You need to create a deployment named `mydep` under the local endpoint.",
     "options": [
       {
         "id": "A",
@@ -4741,7 +4741,7 @@
   {
     "question_id": "q_012",
     "type": "multiple_choice_multiple_answer",
-    "question": "You want to implement a scalable and maintainable solution to automate the retraining of an image classification model using MLOps.",
+    "question": "Note: This is a Yes/No scenario question as seen on the real DP-100 exam. Select Yes if the statement is correct, No if it is not.\n\nYou want to implement a scalable and maintainable solution to automate the retraining of an image classification model using MLOps.",
     "options": [
       {
         "id": "A",
