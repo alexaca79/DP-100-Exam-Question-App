@@ -267,10 +267,13 @@ function initDrag(){
   list.addEventListener('dragstart',e=>{const it=e.target.closest('.order-item');if(!it)return;dragSrcIdx=+it.dataset.idx;setTimeout(()=>it.classList.add('dragging'),0);});
   list.addEventListener('dragend',e=>{const it=e.target.closest('.order-item');if(it)it.classList.remove('dragging');list.querySelectorAll('.order-item').forEach(i=>i.classList.remove('drag-over'));});
   list.addEventListener('dragover',e=>{e.preventDefault();const it=e.target.closest('.order-item');if(!it)return;list.querySelectorAll('.order-item').forEach(i=>i.classList.remove('drag-over'));it.classList.add('drag-over');});
+  list.addEventListener('dragover',e=>{e.preventDefault();});
   list.addEventListener('drop',e=>{
     e.preventDefault();const it=e.target.closest('.order-item');if(!it)return;
-    const di=+it.dataset.idx;if(dragSrcIdx===di)return;
-    [currentOrder[dragSrcIdx],currentOrder[di]]=[currentOrder[di],currentOrder[dragSrcIdx]];
+    const di=+it.dataset.idx;if(dragSrcIdx===di||dragSrcIdx===null)return;
+    const moved=currentOrder.splice(dragSrcIdx,1)[0];
+    currentOrder.splice(di,0,moved);
+    dragSrcIdx=null;
     const q=sessionQuestions[currentIndex],m={};q.options.forEach(o=>m[o.id]=o.text);
     list.innerHTML=currentOrder.map((id,i)=>`<div class="order-item" draggable="true" data-idx="${i}" data-id="${id}"><span class="order-handle">&#8943;</span><span class="order-num">${i+1}</span><span class="order-text">${esc(m[id]||id)}</span></div>`).join('');
     initDrag();
@@ -284,7 +287,7 @@ function initDrag(){
       if(dest&&tsi!==null){
         const di=+dest.dataset.idx;
         if(tsi!==di){
-          [currentOrder[tsi],currentOrder[di]]=[currentOrder[di],currentOrder[tsi]];
+          const moved=currentOrder.splice(tsi,1)[0];currentOrder.splice(di,0,moved);
           const q=sessionQuestions[currentIndex],m={};q.options.forEach(o=>m[o.id]=o.text);
           list.innerHTML=currentOrder.map((id,i)=>`<div class="order-item" draggable="true" data-idx="${i}" data-id="${id}"><span class="order-handle">&#8943;</span><span class="order-num">${i+1}</span><span class="order-text">${esc(m[id]||id)}</span></div>`).join('');
           initDrag();
