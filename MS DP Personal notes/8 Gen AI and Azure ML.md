@@ -520,9 +520,9 @@ To create an Agent with Azure AI foundry and also a RAG you could use a **Promt 
 
 https://microsoftlearning.github.io/mslearn-ai-studio/Instructions/04-Use-own-data.html
 
-# Fine tunning a LLM in Azure AI Foundry
+# Fine tuning a LLM in Azure AI Foundry
 
-the way to do fine tunning to a LLM could be with a JSON Lines (JsonL) file. With this we could specify structure with promt and output expected from the model to the user. Something like this:
+the way to do fine tuning to a LLM could be with a JSON Lines (JsonL) file. With this we could specify structure with prompt and output expected from the model to the user. Something like this:
 
 ```json
 {"messages": [{

@@ -40,7 +40,7 @@ There are different ways to create datastores with a graphical UX, Azure command
 
 `blob_storage:` Almacenamiento de objetos en la nube para grandes cantidades de datos no estructurados. Se puede acceder mediante la API REST, SDKs de Azure, PowerShell y la CLI de Azure.
 
-[Para saber mas de Blob Storage, click en este ejemplo](/aux%20examples/BlobStorage.md)
+[Para saber mas de Blob Storage, click en este ejemplo](/examples/BlobStorage.md)
 
 **Example of blob storage connection to connect Azure Blob Storage container**
 

@@ -2,7 +2,7 @@
 
 Before reading this documentation, please be sure that you understand *what a conda file is* and how it works. In case you are not sure how to use it and what they are, please read this small documentation to give a brief idea. 
 
-[Click here to read conda examples](./aux%20examples/yml-conda%20files.md)
+[Click here to read conda examples](./examples/yml-conda%20files.md)
 
 # Endpoints and hosting
 
