@@ -54,7 +54,7 @@ On the other hand the memory optimized have a higher memory-to-CPU ratio and it'
 
 **Third configuration**
 
-Spark: Apache Spark, you know the real "la vieja y confiable". Spark allows to distribute the processing into different virtual machines.
+Spark: Apache Spark, a reliable distributed processing framework. Spark allows to distribute the processing into different virtual machines.
 
 # The deployment of a model
 

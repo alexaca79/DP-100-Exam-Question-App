@@ -276,7 +276,7 @@ from azure.ai.ml.entities import AccountKeyConfiguration
 
 store = AzureBlobDatastore(
     name="blob_training_data",
-    description="Blob Storage for training data. Learning how to do it in Python. Wiiiiiii",
+    description="Blob Storage for training data",
     account_name="dp100demo1071935313",
     container_name="training-data", 
     credentials=AccountKeyConfiguration(
@@ -287,7 +287,7 @@ store = AzureBlobDatastore(
 ml_client.create_or_update(store)
 ```
 ```output
-AzureBlobDatastore({'type': <DatastoreType.AZURE_BLOB: 'AzureBlob'>, 'name': 'blob_training_data', 'description': 'Blob Storage for training data. Learning how to do it in Python. Wiiiiiii', 'tags': {}, 'properties': {}, 'print_as_yaml': False, 'id': '/subscriptions/77555a2f-fcc7-4967-a3f9-7f3061185b23/resourceGroups/rg-dp100/providers/Microsoft.MachineLearningServices/workspaces/dp100demo/datastores/blob_training_data', 'Resource__source_path': '', 'base_path': '/mnt/batch/tasks/shared/LS_root/mounts/clusters/smith-computer/code/Users/jhsgarciamu/azure-ml-labs/Labs/03', 'creation_context': None, 'serialize': <msrest.serialization.Serializer object at 0x7fd234ed1600>, 'credentials': {'type': 'account_key'}, 'container_name': 'training-data', 'account_name': 'dp100demo1071935313', 'endpoint': 'core.windows.net', 'protocol': 'https'})
+AzureBlobDatastore({'type': <DatastoreType.AZURE_BLOB: 'AzureBlob'>, 'name': 'blob_training_data', 'description': 'Blob Storage for training data', 'tags': {}, 'properties': {}, ...})
 ```
 
 **With this, the data storage is created and we can list it now**

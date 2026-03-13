@@ -38,9 +38,9 @@ storage -> credential-based / identity-based authentication -> SQL/dataGen2/API
 
 There are different ways to create datastores with a graphical UX, Azure command-line interface (CLI), and Python (SDK).
 
-`blob_storage:` Almacenamiento de objetos en la nube para grandes cantidades de datos no estructurados. Se puede acceder mediante la API REST, SDKs de Azure, PowerShell y la CLI de Azure.
+`blob_storage:` Cloud object storage for large amounts of unstructured data. Accessible via the REST API, Azure SDKs, PowerShell, and Azure CLI.
 
-[Para saber mas de Blob Storage, click en este ejemplo](/examples/BlobStorage.md)
+[For more on Blob Storage, click this example](/examples/BlobStorage.md)
 
 **Example of blob storage connection to connect Azure Blob Storage container**
 
@@ -164,10 +164,10 @@ all_files = glob.glob(data_path + "/*.csv")
 df = pd.concat((pd.read_csv(f) for f in all_files), sort=False)
 ```
 
-Este script se usaria por medio de la consola de la siguiente manera:
+This script would be run via console as follows:
 
 ```bash
-python script.py --input_data "/ruta/a/la/carpeta"
+python script.py --input_data "/path/to/folder"
 ```
 
 ### Create a MLTable data asset
@@ -229,10 +229,10 @@ df = tbl.to_pandas_dataframe()
 print(df.head(10))
 ```
 
-**NOTE!** Againg, this is suppused to be a job and it will run by console. Something like the code below. A common approach is to convert the tabular data to a Pandas data frame. However, you can also convert the data to a Spark data frame if that suits your workload better.
+**NOTE!** Again, this is supposed to be a job and it will run by console. Something like the code below. A common approach is to convert the tabular data to a Pandas data frame. However, you can also convert the data to a Spark data frame if that suits your workload better.
 
 ```bash
-python script_mltable.py --input_data "/ruta/a/la/carpeta"
+python script_mltable.py --input_data "/path/to/folder"
 ```
 
 ## Data access modes (DP-100 important!)
@@ -284,7 +284,7 @@ https://microsoftlearning.github.io/mslearn-azure-ml/Instructions/03-Make-data-a
   <img src="pics/image-2.png" width="900" height="600">
 </p>
 
-It is possible to create new containers within the data storage. Remember that what we want to do here is to create a Storage managment system that allows to store data and retrieved when needed. *To create a container just simply click on +Container button*
+It is possible to create new containers within the data storage. Remember that what we want to do here is to create a storage management system that allows to store data and retrieve it when needed. *To create a container just simply click on +Container button*
 
 **Notebooks and codes are saved in the file share menu in code slider**
 

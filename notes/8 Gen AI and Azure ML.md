@@ -6,7 +6,7 @@ Microsoft offers different services related to AI. To use these services, you ne
 
  * Azure OpenAI: GPT family, DALL-E, and so on
  * Azure AI Vision: Offers models and APIs to implement computer vision
- * Azure AI Speech: Well, the name "speaks" for itself (Ba-Dum-Tss)
+ * Azure AI Speech: Speech-to-text, text-to-speech, and speech translation services
  * Azure AI Language: NLP and Text mining
  * AI Content Safety: Advanced algorithms to process image, text, and content potentially offensive or risky
  * Azure AI Translator: Model to translate different languages
@@ -36,7 +36,7 @@ There are different roles within the Hub configuration workspace.
  * Contributor: Same as before but isn't able to manage hub permissions on the existing resources.
  * Azure AI Developer: Same as before but isn't able to create new hubs and manage hub permissions.
  * Azure AI Inference Deployment Operator: All permissions required to create a resource deployment within a resource group.
- * Reader: Read only (Dah!)
+ * Reader: Read only access
 
 Project level roles are:
 

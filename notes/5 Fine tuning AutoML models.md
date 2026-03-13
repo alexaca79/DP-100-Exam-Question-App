@@ -459,9 +459,9 @@ And finally in the **Trials** tab will show all models that have been trained an
 
 # Run pipelines 
 
-Well, i fraking workflow... You know it, right? If not, search for the definition on google. Be a good boy and type "What is a pipeline in data sciente?" and go back after that.
+A pipeline is a workflow that chains multiple steps together. Each step is a reusable component.
 
-Are you done? Good boy! Attaboy! Now, let us continue.
+Are you familiar with the concept? Good. Now, let us continue.
 
  * Components: reusable scripts that could be shared across users and workspaces. We use them to build pipelines and share ready-to-go code
  The magic with components it's that the could be prepared to do any stuff in the way you want in order to decompose a entire process in small pieces and use those pieces across the organization. For example, a train-test split process could be a component that could be reusable across workspaces. Or maybe something specific with the data within the organization process. *Sky is the limit my friend*

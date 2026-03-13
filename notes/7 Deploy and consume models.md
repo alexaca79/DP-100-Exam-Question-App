@@ -87,7 +87,7 @@ env = Environment(
     image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
     conda_file="./conda.yml",
     name="deployment-environment",
-    description="Entorno con imagen Docker base y dependencias Conda.",
+    description="Environment with Docker base image and Conda dependencies.",
 )
 ml_client.environments.create_or_update(env)
 ```
@@ -187,11 +187,11 @@ blue_deployment = ManagedOnlineDeployment(
     name="blue", # just to give it a name
     endpoint_name=online_endpoint_name, # the unique name of the endpoint
     model=model,
-    instance_type="Standard_D2as_v4", # tipo de instance cpu deploy, una VM de la tabla de compute disponibles
-    instance_count=1, # cuantas copias de la VM se quiere levantar. Mas instancias, mayor disponibilidad, balance de carga a peticiones simultaneas
-    # En resumen:
-    # instance_type="Standard_D2as_v4"   - ¿Qué máquina uso?
-    # instance_count=1                  - ¿Cuántas máquinas levanto?
+    instance_type="Standard_D2as_v4", # VM type for CPU deployment, from the available compute table
+    instance_count=1, # how many copies of the VM to spin up. More instances = higher availability and load balancing
+    # Summary:
+    # instance_type="Standard_D2as_v4"   - Which VM to use?
+    # instance_count=1                  - How many VMs to spin up?
 )
 
 # Finally let's create the deployment
@@ -202,8 +202,8 @@ ml_client.online_deployments.begin_create_or_update(blue_deployment).result()
 **Usually a deployment takes around 10-15 minutes** and of course, it is needes to be **FIRST, DEPLOYED** do to any testing. After that is done, we could proceed with some testing.
 
 ```python
-# blue deployment takes 100 traffic: Basicamente dice que todo el trafico del endpoint  debe ser atendido por el deployment llamado blue. En un escenario hipotetitico donde se tengan varios deployment se podria asignar porcentaje diferentes a cada uno de ellos para que lidien con el trafico. 
-# endpoint.traffic = {"blue": 80, "green": 20} - Esto seria una relacion 80-20 de trafico compartido
+# blue deployment takes 100 traffic: This means all endpoint traffic is handled by the deployment named 'blue'. In a scenario with multiple deployments, you can assign different percentages to each one for load sharing.
+# endpoint.traffic = {"blue": 80, "green": 20} - This would be an 80-20 traffic split
 endpoint.traffic = {"blue": 100}
 ml_client.begin_create_or_update(endpoint).result()
 ```
