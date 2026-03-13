@@ -6642,5 +6642,425 @@
       }
     ],
     "feedback": "BanditPolicy is the most common early termination policy for sweep jobs. It stops trials that fall outside a slack_factor relative to the best run, saving compute costs during hyperparameter tuning."
+  },
+  {
+    "question_id": "hard_001",
+    "type": "multiple_choice_single_answer",
+    "question": "You deploy an MLflow model to a managed online endpoint using Azure ML SDK v2. A colleague asks you to also provide a scoring script and a custom environment definition. What should you tell them?",
+    "options": [
+      {"id": "A", "text": "Both a scoring script and environment are always required for any model deployment to a managed online endpoint.", "is_correct": false, "explanation": "This is only true for custom (non-MLflow) models."},
+      {"id": "B", "text": "An MLflow model deployment auto-generates the scoring script and environment — neither is required.", "is_correct": true, "explanation": "When deploying an MLflow model (AssetTypes.MLFLOW_MODEL), Azure ML automatically generates the scoring script (with init() and run()) and the conda environment based on the MLmodel file. This is a key advantage of MLflow models."},
+      {"id": "C", "text": "The scoring script is auto-generated, but you must always provide a custom environment.", "is_correct": false, "explanation": "The environment is also auto-generated from the MLmodel file's conda.yaml."},
+      {"id": "D", "text": "The environment is auto-generated, but you must always provide a scoring script.", "is_correct": false, "explanation": "The scoring script is also auto-generated for MLflow models."}
+    ],
+    "feedback": "MLflow model deployments to managed online endpoints require NO scoring script and NO custom environment. Azure ML auto-generates both from the MLmodel metadata. Custom model deployments require both."
+  },
+  {
+    "question_id": "hard_002",
+    "type": "multiple_choice_single_answer",
+    "question": "You are building a pipeline in Azure ML SDK v2 using YAML. In step 'train_step', you need to consume the output of a previous step called 'prep_step'. Which syntax correctly references the prep_step's output named 'cleaned_data' as an input to train_step?",
+    "options": [
+      {"id": "A", "text": "${{inputs.cleaned_data}}", "is_correct": false, "explanation": "This references the job-level inputs, not the output of another step."},
+      {"id": "B", "text": "${{parent.jobs.prep_step.outputs.cleaned_data}}", "is_correct": true, "explanation": "In pipeline YAML, ${{parent.jobs.<step_name>.outputs.<output_name>}} is the correct syntax to reference an output from another step in the same pipeline."},
+      {"id": "C", "text": "${{jobs.prep_step.outputs.cleaned_data}}", "is_correct": false, "explanation": "Missing 'parent.' prefix. The correct syntax requires ${{parent.jobs...}} to reference sibling steps."},
+      {"id": "D", "text": "${{steps.prep_step.outputs.cleaned_data}}", "is_correct": false, "explanation": "'steps' is not a valid keyword in Azure ML pipeline YAML. Use 'parent.jobs' instead."}
+    ],
+    "feedback": "In Azure ML pipeline YAML, cross-step references use ${{parent.jobs.<step_name>.outputs.<output_name>}}. Pipeline-level inputs use ${{parent.inputs.<input_name>}}. This is a critical pattern for the DP-100 exam."
+  },
+  {
+    "question_id": "hard_003",
+    "type": "multiple_choice_single_answer",
+    "question": "You configure a batch deployment in Azure ML SDK v2. You want all predictions from all mini-batches to be written into a single output CSV file. Which BatchDeploymentOutputAction should you use?",
+    "options": [
+      {"id": "A", "text": "BatchDeploymentOutputAction.APPEND_ROW", "is_correct": true, "explanation": "APPEND_ROW appends each mini-batch's predictions as rows into a single output file (e.g., predictions.csv). This is the standard approach for batch inference where you want consolidated results."},
+      {"id": "B", "text": "BatchDeploymentOutputAction.SUMMARY_ONLY", "is_correct": false, "explanation": "SUMMARY_ONLY generates only a summary of the batch job without per-row prediction output."},
+      {"id": "C", "text": "BatchDeploymentOutputAction.WRITE_FILE", "is_correct": false, "explanation": "WRITE_FILE is not a valid BatchDeploymentOutputAction in Azure ML SDK v2."},
+      {"id": "D", "text": "BatchDeploymentOutputAction.MERGE_ROWS", "is_correct": false, "explanation": "MERGE_ROWS is not a valid BatchDeploymentOutputAction. The correct option is APPEND_ROW."}
+    ],
+    "feedback": "APPEND_ROW consolidates all mini-batch predictions into one file. SUMMARY_ONLY skips per-row output. These are the only two valid output actions for batch deployments."
+  },
+  {
+    "question_id": "hard_004",
+    "type": "multiple_choice_single_answer",
+    "question": "You are configuring a managed online endpoint for a production model. You need authentication that uses short-lived tokens based on Microsoft Entra ID rather than static API keys. Which auth_mode should you set?",
+    "options": [
+      {"id": "A", "text": "key", "is_correct": false, "explanation": "'key' uses static API keys that do not expire automatically. While simple, they are less secure than token-based auth for production scenarios."},
+      {"id": "B", "text": "aml_token", "is_correct": true, "explanation": "'aml_token' uses Microsoft Entra ID (formerly Azure AD) to generate short-lived tokens. These tokens expire and must be refreshed, making this option more secure for production workloads."},
+      {"id": "C", "text": "managed_identity", "is_correct": false, "explanation": "'managed_identity' is not a valid auth_mode for endpoints. Managed identities are used for compute-to-resource authentication."},
+      {"id": "D", "text": "oauth2", "is_correct": false, "explanation": "'oauth2' is not a valid auth_mode for Azure ML managed online endpoints."}
+    ],
+    "feedback": "Managed online endpoints support two auth modes: 'key' (static API keys) and 'aml_token' (Microsoft Entra ID tokens). For production, 'aml_token' is recommended as tokens are short-lived and auditable."
+  },
+  {
+    "question_id": "hard_005",
+    "type": "multiple_choice_single_answer",
+    "question": "You want to load an MLflow model from a completed run and use native scikit-learn methods like predict_proba(). Which loading method should you use?",
+    "options": [
+      {"id": "A", "text": "mlflow.pyfunc.load_model(model_uri)", "is_correct": false, "explanation": "pyfunc.load_model returns a generic PyFunc wrapper that only exposes the predict() method. Native sklearn methods like predict_proba() are not available."},
+      {"id": "B", "text": "mlflow.sklearn.load_model(model_uri)", "is_correct": true, "explanation": "sklearn.load_model returns the native scikit-learn model object with all its methods, including predict_proba(), decision_function(), and other sklearn-specific APIs."},
+      {"id": "C", "text": "mlflow.load_model(model_uri)", "is_correct": false, "explanation": "There is no generic mlflow.load_model() function. You must use a flavor-specific loader like mlflow.sklearn.load_model() or mlflow.pyfunc.load_model()."},
+      {"id": "D", "text": "mlflow.artifacts.load_model(model_uri)", "is_correct": false, "explanation": "mlflow.artifacts is for downloading artifacts, not loading models."}
+    ],
+    "feedback": "mlflow.pyfunc.load_model() returns a generic wrapper with only predict(). mlflow.sklearn.load_model() returns the native sklearn model with all its methods. Use the flavor-specific loader when you need framework-specific APIs."
+  },
+  {
+    "question_id": "hard_006",
+    "type": "multiple_choice_single_answer",
+    "question": "You are setting up a compute cluster for training jobs in Azure ML. You want to minimize costs by allowing Azure to reclaim the VMs when capacity is needed, accepting that jobs may be preempted. Which configuration should you use?",
+    "options": [
+      {"id": "A", "text": "Set tier='Dedicated' and min_instances=0", "is_correct": false, "explanation": "Dedicated VMs are never preempted but cost more. min_instances=0 saves cost when idle but does not reduce per-hour VM cost."},
+      {"id": "B", "text": "Set tier='LowPriority' and min_instances=0", "is_correct": true, "explanation": "LowPriority VMs are significantly cheaper (up to 80% discount) but can be preempted when Azure needs the capacity. Combined with min_instances=0, the cluster also scales to zero when not in use, maximizing cost savings."},
+      {"id": "C", "text": "Set tier='Spot' and min_instances=1", "is_correct": false, "explanation": "'Spot' is not a valid tier value for Azure ML compute clusters. The correct values are 'Dedicated' and 'LowPriority'."},
+      {"id": "D", "text": "Set tier='LowPriority' and min_instances=2", "is_correct": false, "explanation": "While LowPriority is correct for cost savings, min_instances=2 keeps 2 VMs running constantly, which wastes money when no jobs are running."}
+    ],
+    "feedback": "LowPriority VMs offer up to 80% discount but can be preempted. Always use min_instances=0 with LowPriority to avoid paying for idle VMs. This is the most cost-effective configuration for non-critical training jobs."
+  },
+  {
+    "question_id": "hard_007",
+    "type": "multiple_choice_single_answer",
+    "question": "You are configuring an AutoML classification job using Azure ML SDK v2. The training data is stored as a CSV file registered as a URI_FILE data asset. When you submit the job, it fails. What is the most likely cause?",
+    "options": [
+      {"id": "A", "text": "AutoML requires the data to be registered as an MLTABLE data asset, not URI_FILE.", "is_correct": true, "explanation": "AutoML jobs in Azure ML require MLTABLE (AssetTypes.MLTABLE) data assets. MLTABLE includes a schema definition (MLTable file) that tells AutoML how to read the tabular data. URI_FILE and URI_FOLDER are not supported as inputs to AutoML."},
+      {"id": "B", "text": "AutoML requires the data to be stored in Azure Data Lake, not Blob Storage.", "is_correct": false, "explanation": "AutoML works with data in any supported datastore, including Blob Storage. The issue is the data asset type, not the storage type."},
+      {"id": "C", "text": "AutoML requires a compute instance, not a compute cluster.", "is_correct": false, "explanation": "AutoML runs on compute clusters. Compute instances are for development."},
+      {"id": "D", "text": "AutoML does not support CSV files and requires Parquet format.", "is_correct": false, "explanation": "AutoML supports CSV files. The issue is that the data must be wrapped in an MLTABLE data asset with a schema definition."}
+    ],
+    "feedback": "AutoML REQUIRES MLTABLE data assets. The MLTable file (in the same folder as the data) specifies how to read the data (delimiter, headers, column types). URI_FILE and URI_FOLDER do not include schema information needed by AutoML."
+  },
+  {
+    "question_id": "hard_008",
+    "type": "multiple_choice_single_answer",
+    "question": "You want to schedule an Azure ML pipeline to run daily at 6:00 AM UTC. Which SDK v2 approach should you use?",
+    "options": [
+      {"id": "A", "text": "Create a JobSchedule with a RecurrenceTrigger(frequency='day', interval=1, schedule=RecurrencePattern(hours=6, minutes=0))", "is_correct": true, "explanation": "JobSchedule with RecurrenceTrigger is the correct SDK v2 approach. RecurrenceTrigger supports frequency (minute, hour, day, week, month), interval, and a RecurrencePattern for specifying exact times."},
+      {"id": "B", "text": "Use Azure Data Factory to trigger the pipeline on a cron schedule", "is_correct": false, "explanation": "While ADF can orchestrate Azure ML pipelines, the native SDK v2 approach is JobSchedule with RecurrenceTrigger. This is more tightly integrated and the expected answer on DP-100."},
+      {"id": "C", "text": "Create a CronTrigger with expression '0 6 * * *' and attach it to the pipeline", "is_correct": false, "explanation": "CronTrigger with a cron expression is a valid approach, but the question asks for the SDK v2 pattern. RecurrenceTrigger with RecurrencePattern is the primary SDK v2 approach."},
+      {"id": "D", "text": "Set compute cluster idle_time_before_scale_down to trigger the pipeline daily", "is_correct": false, "explanation": "idle_time_before_scale_down controls when a cluster scales down after jobs complete. It has nothing to do with scheduling pipelines."}
+    ],
+    "feedback": "Azure ML SDK v2 uses JobSchedule with RecurrenceTrigger for scheduling pipelines. CronTrigger is also valid but RecurrenceTrigger is the primary approach tested on DP-100."
+  },
+  {
+    "question_id": "hard_009",
+    "type": "multiple_choice_single_answer",
+    "question": "You are building a Responsible AI dashboard in Azure ML. You want to understand what minimum changes to a patient's features would change the model's prediction from 'high risk' to 'low risk'. Which RAI component should you use?",
+    "options": [
+      {"id": "A", "text": "Error Analysis", "is_correct": false, "explanation": "Error Analysis identifies subgroups where the model performs poorly. It does not analyze what feature changes would alter a prediction."},
+      {"id": "B", "text": "Model Explainability (SHAP)", "is_correct": false, "explanation": "SHAP shows feature importance — which features most influenced a prediction — but does not tell you what changes would flip it."},
+      {"id": "C", "text": "Counterfactual Analysis", "is_correct": true, "explanation": "Counterfactual Analysis answers 'what-if' questions: what is the minimum change to input features that would result in a different prediction? For example, 'if BMI decreased by 5, the prediction would change from high-risk to low-risk'."},
+      {"id": "D", "text": "Causal Analysis", "is_correct": false, "explanation": "Causal Analysis identifies causal relationships between features and outcomes, but does not provide minimal feature change scenarios for individual predictions."}
+    ],
+    "feedback": "Counterfactual Analysis = 'What would need to change?' Error Analysis = 'Where does the model fail?' SHAP = 'What features matter most?' Causal Analysis = 'What actually causes the outcome?'"
+  },
+  {
+    "question_id": "hard_010",
+    "type": "multiple_choice_single_answer",
+    "question": "You need to give a data scientist the ability to submit training jobs and deploy models in an Azure ML workspace, but they should NOT be able to create or delete compute resources or modify workspace settings. Which built-in role should you assign?",
+    "options": [
+      {"id": "A", "text": "Contributor", "is_correct": false, "explanation": "Contributor grants full access to all resources including creating/deleting compute and modifying workspace settings. This exceeds the requirements."},
+      {"id": "B", "text": "AzureML Data Scientist", "is_correct": true, "explanation": "AzureML Data Scientist can submit experiments, register data/models, deploy endpoints, but CANNOT create/delete compute or modify workspace settings. This is the least-privilege role for a data scientist."},
+      {"id": "C", "text": "AzureML Compute Operator", "is_correct": false, "explanation": "AzureML Compute Operator can create and manage compute resources, but this role alone does not grant the ability to submit training jobs or deploy models."},
+      {"id": "D", "text": "Reader", "is_correct": false, "explanation": "Reader is view-only and cannot submit experiments, register models, or deploy endpoints."}
+    ],
+    "feedback": "AzureML Data Scientist is the least-privilege built-in role for submitting jobs and deploying models. If compute creation is also needed, assign both AzureML Data Scientist AND AzureML Compute Operator."
+  },
+  {
+    "question_id": "hard_011",
+    "type": "multiple_choice_single_answer",
+    "question": "You use mlflow.autolog() in your training script. Your colleague uses mlflow.sklearn.autolog() instead. What is the key difference?",
+    "options": [
+      {"id": "A", "text": "mlflow.autolog() only works with TensorFlow, not scikit-learn.", "is_correct": false, "explanation": "mlflow.autolog() is framework-agnostic and auto-detects the ML framework being used, including scikit-learn."},
+      {"id": "B", "text": "mlflow.sklearn.autolog() captures more detailed scikit-learn specific information than mlflow.autolog().", "is_correct": true, "explanation": "Framework-specific autolog (e.g., mlflow.sklearn.autolog()) captures more detailed framework-specific artifacts like pipeline visualizations, feature importances, and training/validation scores. mlflow.autolog() auto-detects the framework but may capture less detail."},
+      {"id": "C", "text": "mlflow.autolog() logs the model but mlflow.sklearn.autolog() does not.", "is_correct": false, "explanation": "Both log the trained model by default."},
+      {"id": "D", "text": "There is no difference — they produce identical outputs for scikit-learn models.", "is_correct": false, "explanation": "Framework-specific autolog provides richer, more detailed logging for that specific framework."}
+    ],
+    "feedback": "Framework-specific autolog (sklearn, xgboost, tensorflow, etc.) captures MORE detail than generic autolog. For scikit-learn, this includes pipeline visualizations and extra metrics."
+  },
+  {
+    "question_id": "hard_012",
+    "type": "multiple_choice_single_answer",
+    "question": "You have trained a model and want to register it in Azure ML. You logged the model during training using mlflow.sklearn.log_model(). Now you want to register it from the completed run. Which is the correct model path format?",
+    "options": [
+      {"id": "A", "text": "azureml://jobs/{job_name}/outputs/artifacts/paths/model/", "is_correct": true, "explanation": "This is the correct Azure ML URI format to reference a model artifact from a completed job. Combined with type=AssetTypes.MLFLOW_MODEL, this registers the MLflow model in the workspace model registry."},
+      {"id": "B", "text": "runs:/{run_id}/model", "is_correct": false, "explanation": "This is the MLflow URI format (not Azure ML URI). While valid for mlflow.register_model(), the question asks about registering via the Azure ML SDK v2 Model class, which uses the azureml:// URI format."},
+      {"id": "C", "text": "models:/{model_name}/latest", "is_correct": false, "explanation": "This format references an already-registered model in the MLflow model registry. It cannot be used to register a new model from a run."},
+      {"id": "D", "text": "azureml://datastores/default/paths/model/", "is_correct": false, "explanation": "This references a datastore path, not a job output. Model artifacts from training jobs are in the job outputs, not in datastores."}
+    ],
+    "feedback": "Two ways to register: (1) Azure ML SDK v2: Model(path='azureml://jobs/{name}/outputs/artifacts/paths/model/', type=AssetTypes.MLFLOW_MODEL) (2) MLflow: mlflow.register_model('runs:/{run_id}/model', 'name')"
+  },
+  {
+    "question_id": "hard_013",
+    "type": "multiple_choice_single_answer",
+    "question": "You are training a model in Azure ML and want to use data stored in a datastore. The dataset is too large to download to the compute node. Which data access mode should you use for the input?",
+    "options": [
+      {"id": "A", "text": "download", "is_correct": false, "explanation": "Download copies the entire dataset to the compute node's local disk before training starts. For very large datasets, this can cause disk space issues and slow startup."},
+      {"id": "B", "text": "ro_mount", "is_correct": true, "explanation": "ro_mount (read-only mount) mounts the data as a virtual filesystem. Data is streamed on-demand without copying the entire dataset to the compute node. This is the default for inputs and ideal for large datasets."},
+      {"id": "C", "text": "rw_mount", "is_correct": false, "explanation": "rw_mount is a read-write mount, which is the default for outputs not inputs. While it would work for reading, ro_mount is more appropriate for input data as it prevents accidental writes."},
+      {"id": "D", "text": "upload", "is_correct": false, "explanation": "Upload mode is used for outputs — writing data from compute to storage. It cannot be used for reading input data."}
+    ],
+    "feedback": "Data access modes: ro_mount (default input, read-only stream), rw_mount (default output, read-write), download (copy all to local), upload (write to storage), direct (pass URI only)."
+  },
+  {
+    "question_id": "hard_014",
+    "type": "multiple_choice_single_answer",
+    "question": "You use Bayesian sampling for a hyperparameter sweep job. Which of the following search space definitions is NOT compatible with Bayesian sampling?",
+    "options": [
+      {"id": "A", "text": "Choice(values=[10, 50, 100])", "is_correct": false, "explanation": "Choice is compatible with Bayesian sampling."},
+      {"id": "B", "text": "Uniform(min_value=0.001, max_value=1.0)", "is_correct": false, "explanation": "Uniform is compatible with Bayesian sampling."},
+      {"id": "C", "text": "QUniform(min_value=1, max_value=100, q=5)", "is_correct": false, "explanation": "QUniform is compatible with Bayesian sampling."},
+      {"id": "D", "text": "Normal(mu=0, sigma=1)", "is_correct": true, "explanation": "Bayesian sampling only supports Choice, Uniform, and QUniform distributions. Normal, LogNormal, LogUniform and their quantized variants are NOT supported with Bayesian sampling."}
+    ],
+    "feedback": "Bayesian sampling supports: Choice, Uniform, QUniform. It does NOT support: Normal, LogNormal, LogUniform, QNormal, QLogNormal, QLogUniform, Randint. Use Random sampling for these distributions."
+  },
+  {
+    "question_id": "hard_015",
+    "type": "multiple_choice_single_answer",
+    "question": "You want to create a model signature for an MLflow model. You have the training data X_train and the trained model. Which code correctly creates an inferred signature?",
+    "options": [
+      {"id": "A", "text": "signature = infer_signature(X_train)", "is_correct": false, "explanation": "infer_signature requires both input data AND model output to create a complete signature with input and output schemas."},
+      {"id": "B", "text": "signature = infer_signature(model, X_train)", "is_correct": false, "explanation": "The arguments are in the wrong order and the model object itself is not what infer_signature expects. It expects input data and prediction output."},
+      {"id": "C", "text": "signature = infer_signature(X_train, model.predict(X_train))", "is_correct": true, "explanation": "infer_signature(input_data, model_output) is correct. It analyses the input data structure and the prediction output to create a ModelSignature with both input and output schemas."},
+      {"id": "D", "text": "signature = ModelSignature(X_train, model.predict(X_train))", "is_correct": false, "explanation": "ModelSignature takes Schema objects (inputs=Schema, outputs=Schema), not raw data. Use infer_signature to create a signature from raw data."}
+    ],
+    "feedback": "infer_signature(X_train, model.predict(X_train)) is the standard way to create signatures. The first arg is input data, the second is prediction output. Import from mlflow.models.signature."
+  },
+  {
+    "question_id": "hard_016",
+    "type": "multiple_choice_single_answer",
+    "question": "You create an Azure ML workspace. Which associated resource is NOT created immediately at workspace creation time, but is instead created on-demand when first needed?",
+    "options": [
+      {"id": "A", "text": "Azure Storage Account", "is_correct": false, "explanation": "The Storage Account is created immediately with the workspace to store metadata, logs, and outputs."},
+      {"id": "B", "text": "Azure Key Vault", "is_correct": false, "explanation": "Key Vault is created immediately with the workspace to store secrets, connection strings, and credentials."},
+      {"id": "C", "text": "Azure Container Registry (ACR)", "is_correct": true, "explanation": "ACR is NOT created at workspace creation time. It is created on-demand when you first build a custom environment or deploy a model that requires a container image. This saves costs for workspaces that haven't deployed models yet."},
+      {"id": "D", "text": "Application Insights", "is_correct": false, "explanation": "Application Insights is created immediately with the workspace for monitoring endpoint deployments."}
+    ],
+    "feedback": "A workspace creates 3 resources immediately: Storage Account, Key Vault, and Application Insights. Azure Container Registry (ACR) is created on-demand to avoid unnecessary costs."
+  },
+  {
+    "question_id": "hard_017",
+    "type": "multiple_choice_single_answer",
+    "question": "You have deployed two model versions ('v1' and 'v2') to a managed online endpoint. Currently v1 handles 100% traffic. You want to gradually test v2 with 10% of production traffic. Which code correctly configures this?",
+    "options": [
+      {"id": "A", "text": "endpoint.traffic = {\"v2\": 10}\nml_client.online_endpoints.begin_create_or_update(endpoint).result()", "is_correct": false, "explanation": "This sets v2 to 10% but removes v1 entirely (v1 would get 0% since it's not specified). Traffic percentages must sum to 100%."},
+      {"id": "B", "text": "endpoint.traffic = {\"v1\": 90, \"v2\": 10}\nml_client.online_endpoints.begin_create_or_update(endpoint).result()", "is_correct": true, "explanation": "Correct. Traffic must include ALL deployments and percentages must sum to 100%. v1 gets 90%, v2 gets 10%."},
+      {"id": "C", "text": "endpoint.traffic = {\"v1\": 100, \"v2\": 10}\nml_client.online_endpoints.begin_create_or_update(endpoint).result()", "is_correct": false, "explanation": "Traffic percentages sum to 110%, which is invalid. They must sum to exactly 100%."},
+      {"id": "D", "text": "ml_client.online_deployments.update_traffic(\"v1\", 90, \"v2\", 10)", "is_correct": false, "explanation": "update_traffic is not a valid method. Traffic is configured via the endpoint.traffic property and then updating the endpoint."}
+    ],
+    "feedback": "Traffic allocation: set endpoint.traffic dict with ALL deployment names, values must sum to 100%. Then call ml_client.online_endpoints.begin_create_or_update(endpoint).result()."
+  },
+  {
+    "question_id": "hard_018",
+    "type": "multiple_choice_single_answer",
+    "question": "You are comparing multiple training runs in Azure ML using MLflow. You want to find the run with the highest AUC score from the 'diabetes-experiment' experiment. Which code is correct?",
+    "options": [
+      {"id": "A", "text": "mlflow.search_runs(experiment_names=['diabetes-experiment'], order_by=['metrics.AUC DESC'], max_results=1)", "is_correct": true, "explanation": "search_runs with order_by and max_results=1 returns the top run. order_by uses 'metrics.<name> DESC' for descending sort."},
+      {"id": "B", "text": "mlflow.get_best_run(experiment_name='diabetes-experiment', metric='AUC')", "is_correct": false, "explanation": "get_best_run is not a valid MLflow function. Use search_runs with order_by."},
+      {"id": "C", "text": "mlflow.search_runs(experiment_names=['diabetes-experiment'], filter_string='MAX(metrics.AUC)')", "is_correct": false, "explanation": "filter_string does not support aggregate functions like MAX(). Use order_by=['metrics.AUC DESC'] with max_results=1."},
+      {"id": "D", "text": "mlflow.list_runs(experiment_name='diabetes-experiment', sort_by='AUC')", "is_correct": false, "explanation": "list_runs is not a valid MLflow function. Use search_runs."}
+    ],
+    "feedback": "mlflow.search_runs() is the primary way to query runs. Use order_by=['metrics.<name> DESC/ASC'] for sorting and filter_string for conditions like 'metrics.accuracy > 0.9'."
+  },
+  {
+    "question_id": "hard_019",
+    "type": "multiple_choice_single_answer",
+    "question": "When connecting to an Azure ML workspace from a local environment using MLflow (not inside an Azure ML job), what must you do before logging experiments?",
+    "options": [
+      {"id": "A", "text": "Call mlflow.set_tracking_uri() with the workspace's MLflow tracking URI", "is_correct": true, "explanation": "When running outside an Azure ML job (e.g., local machine, external notebook), you must explicitly set the MLflow tracking URI to point to the workspace. Inside Azure ML jobs, this is set automatically."},
+      {"id": "B", "text": "Call mlflow.connect_workspace() with the workspace name", "is_correct": false, "explanation": "mlflow.connect_workspace() is not a valid MLflow function. Use mlflow.set_tracking_uri()."},
+      {"id": "C", "text": "Set the MLFLOW_WORKSPACE environment variable", "is_correct": false, "explanation": "MLFLOW_WORKSPACE is not a valid environment variable. You can set MLFLOW_TRACKING_URI as an environment variable, but the standard approach is mlflow.set_tracking_uri()."},
+      {"id": "D", "text": "Nothing — MLflow automatically discovers the closest Azure ML workspace", "is_correct": false, "explanation": "MLflow does NOT auto-discover workspaces from local environments. You must explicitly set the tracking URI. Auto-configuration only happens inside Azure ML jobs."}
+    ],
+    "feedback": "Inside Azure ML jobs: MLflow tracking URI is set automatically. From local/external: you must call mlflow.set_tracking_uri(workspace.mlflow_tracking_uri). Get the URI via ml_client.workspaces.get(name).mlflow_tracking_uri."
+  },
+  {
+    "question_id": "hard_020",
+    "type": "multiple_choice_single_answer",
+    "question": "You create a custom environment for a training job using SDK v2. Which Docker base image is the CURRENT recommended image for CPU-based scikit-learn workloads?",
+    "options": [
+      {"id": "A", "text": "mcr.microsoft.com/azureml/openmpi3.1.2-ubuntu18.04", "is_correct": false, "explanation": "This image uses Ubuntu 18.04 which reached end-of-life. It is deprecated and should not be used for new workloads."},
+      {"id": "B", "text": "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04", "is_correct": true, "explanation": "This is the current recommended base image for CPU workloads. It uses Ubuntu 20.04 with OpenMPI 4.1.0 and supports Python 3.8+."},
+      {"id": "C", "text": "mcr.microsoft.com/azureml/sklearn:latest", "is_correct": false, "explanation": "This is not a valid Azure ML base image path. Use openmpi-based images and install sklearn via conda."},
+      {"id": "D", "text": "python:3.9-slim", "is_correct": false, "explanation": "While this is a valid Docker image, it lacks Azure ML integration (MLflow tracking, data mounting, etc.). Use Azure ML's base images that include these integrations."}
+    ],
+    "feedback": "Use openmpi4.1.0-ubuntu20.04 for CPU workloads. Old images based on ubuntu18.04 are deprecated. For GPU: use openmpi4.1.0-cuda11.x-ubuntu20.04 variants."
+  },
+  {
+    "question_id": "hard_021",
+    "type": "multiple_choice_single_answer",
+    "question": "In the Azure ML SDK v2, you notice that some methods use 'begin_' prefix (like begin_create_or_update) while others don't. What does the 'begin_' prefix indicate?",
+    "options": [
+      {"id": "A", "text": "The operation is synchronous and will block until complete", "is_correct": false, "explanation": "The opposite — begin_ methods are for long-running operations. Non-prefixed methods like create_or_update (for environments, data assets) are typically synchronous."},
+      {"id": "B", "text": "The operation is long-running and returns a poller object — call .result() to wait for completion", "is_correct": true, "explanation": "begin_ prefix indicates a Long Running Operation (LRO). It returns an LROPoller that you can call .result() on to block until the operation completes. Used for compute creation, endpoint deployment, and other operations that take minutes."},
+      {"id": "C", "text": "The operation runs in the background and cannot be awaited", "is_correct": false, "explanation": "begin_ methods CAN be awaited by calling .result() on the returned poller. You can also check status without blocking."},
+      {"id": "D", "text": "The operation requires admin privileges", "is_correct": false, "explanation": "The begin_ prefix has nothing to do with permissions. It indicates the asynchronous nature of the operation."}
+    ],
+    "feedback": "begin_ = Long Running Operation (LRO) returning a poller. Call .result() to wait. Examples: begin_create_or_update (compute, endpoints), begin_delete. Non-begin methods like environments.create_or_update are fast and synchronous."
+  },
+  {
+    "question_id": "hard_022",
+    "type": "multiple_choice_single_answer",
+    "question": "You need to log a trained model using MLflow so that it can be deployed with a custom inference logic that applies a probability threshold before returning predictions. Which approach should you use?",
+    "options": [
+      {"id": "A", "text": "mlflow.sklearn.log_model() with a custom scoring script", "is_correct": false, "explanation": "log_model logs the sklearn model as-is. Custom inference logic (like thresholding) cannot be embedded in the model artifact this way — you'd need a separate scoring script at deployment time."},
+      {"id": "B", "text": "Create a class extending mlflow.pyfunc.PythonModel with a custom predict() method, then log with mlflow.pyfunc.log_model()", "is_correct": true, "explanation": "mlflow.pyfunc.PythonModel lets you define custom load_context() and predict() logic. Your predict() can apply thresholding or any custom inference logic. The model is logged as a pyfunc flavor and can be deployed without a separate scoring script."},
+      {"id": "C", "text": "Use mlflow.log_artifact() to store a script with the threshold logic", "is_correct": false, "explanation": "log_artifact stores a file as an artifact but does not create a deployable model. The custom logic would not be automatically applied at inference time."},
+      {"id": "D", "text": "Set mlflow.autolog(custom_inference=True)", "is_correct": false, "explanation": "autolog does not have a custom_inference parameter. Custom inference logic requires the pyfunc approach."}
+    ],
+    "feedback": "mlflow.pyfunc.PythonModel is the standard way to embed custom inference logic (thresholds, pre/post-processing, multi-model ensembles) into an MLflow model that can be deployed without a scoring script."
+  },
+  {
+    "question_id": "hard_023",
+    "type": "multiple_choice_single_answer",
+    "question": "You are using the Azure ML CLI v2 to create a sweep job. In the YAML file, how do you reference a hyperparameter from the search space in the trial command?",
+    "options": [
+      {"id": "A", "text": "${{inputs.learning_rate}}", "is_correct": false, "explanation": "${{inputs.X}} references job-level inputs, not hyperparameters from the search space."},
+      {"id": "B", "text": "${{search_space.learning_rate}}", "is_correct": true, "explanation": "In sweep job YAML, hyperparameters from the search_space section are referenced using ${{search_space.<param_name>}} in the trial command."},
+      {"id": "C", "text": "${{parameters.learning_rate}}", "is_correct": false, "explanation": "'parameters' is not a valid reference prefix in Azure ML YAML. Use search_space for sweep hyperparameters."},
+      {"id": "D", "text": "${{hyperparameters.learning_rate}}", "is_correct": false, "explanation": "'hyperparameters' is not a valid reference prefix. The YAML section is called search_space, so use ${{search_space.<param_name>}}."}
+    ],
+    "feedback": "In CLI v2 sweep YAML: search_space params use ${{search_space.X}}, job inputs use ${{inputs.X}}, job outputs use ${{outputs.X}}."
+  },
+  {
+    "question_id": "hard_024",
+    "type": "multiple_choice_single_answer",
+    "question": "Your Azure ML workspace uses a system-assigned managed identity for its compute cluster. The cluster needs to read data from an Azure Blob Storage container. Which RBAC role should you assign to the managed identity on the storage account?",
+    "options": [
+      {"id": "A", "text": "Storage Account Contributor", "is_correct": false, "explanation": "Storage Account Contributor can manage the storage account but does NOT grant data access (read/write blobs). It's an ARM-level role, not a data-plane role."},
+      {"id": "B", "text": "Storage Blob Data Reader", "is_correct": true, "explanation": "Storage Blob Data Reader grants read access to blob data. This is the least-privilege role for a compute cluster that only needs to read training data from Blob Storage."},
+      {"id": "C", "text": "Storage Blob Data Owner", "is_correct": false, "explanation": "Storage Blob Data Owner grants full read/write/delete access plus the ability to set permissions. This exceeds what is needed for read-only data access."},
+      {"id": "D", "text": "Reader", "is_correct": false, "explanation": "Reader is an ARM-level role that allows viewing the storage account resource but does NOT grant access to the blob data inside it."}
+    ],
+    "feedback": "For identity-based data access: Storage Blob Data Reader (read), Storage Blob Data Contributor (read+write), Storage Blob Data Owner (full control). ARM roles like Reader/Contributor do NOT grant data access."
+  },
+  {
+    "question_id": "hard_025",
+    "type": "multiple_choice_single_answer",
+    "question": "You need to log metric values at each epoch during model training so that Azure ML Studio shows a chart of the metric over time. Which MLflow logging call is correct?",
+    "options": [
+      {"id": "A", "text": "mlflow.log_metric('loss', loss_value, step=epoch)", "is_correct": true, "explanation": "log_metric with the step parameter logs the metric at a specific step (epoch). This creates a time-series of values that Azure ML Studio renders as a line chart."},
+      {"id": "B", "text": "mlflow.log_metrics({'loss': loss_value, 'epoch': epoch})", "is_correct": false, "explanation": "This logs 'loss' and 'epoch' as two separate single-value metrics. It does not create a time-series chart — each call would overwrite the previous value."},
+      {"id": "C", "text": "mlflow.log_metric('loss_epoch_' + str(epoch), loss_value)", "is_correct": false, "explanation": "This creates a separate metric for each epoch (loss_epoch_0, loss_epoch_1, etc.) instead of a single metric with multiple steps. This won't render as a line chart."},
+      {"id": "D", "text": "mlflow.log_param('loss', loss_value)", "is_correct": false, "explanation": "log_param is for input parameters (hyperparameters), not output metrics. Parameters are single values and cannot be logged with steps."}
+    ],
+    "feedback": "Use mlflow.log_metric(key, value, step=N) to log metrics over time. The step parameter creates a time-series that renders as a chart in Azure ML Studio. Without step, each call overwrites the previous value."
+  },
+  {
+    "question_id": "hard_026",
+    "type": "multiple_choice_single_answer",
+    "question": "You want to share a registered model AND its associated environment across multiple Azure ML workspaces in your organization. What should you use?",
+    "options": [
+      {"id": "A", "text": "Azure ML Registry", "is_correct": true, "explanation": "Azure ML Registry is a centralized, cross-workspace registry for sharing models, environments, components, and data assets across multiple workspaces. It enables MLOps patterns where models are promoted from dev to staging to production workspaces."},
+      {"id": "B", "text": "Azure Container Registry (ACR)", "is_correct": false, "explanation": "ACR stores Docker container images, not ML models or Azure ML assets. Each workspace has its own ACR for environment images."},
+      {"id": "C", "text": "Export the model to Azure Blob Storage and import in each workspace", "is_correct": false, "explanation": "This is a manual process that does not maintain model metadata, versioning, or environment associations."},
+      {"id": "D", "text": "Azure DevOps Artifacts", "is_correct": false, "explanation": "Azure DevOps Artifacts is for software packages (NuGet, npm, etc.), not Azure ML models and environments."}
+    ],
+    "feedback": "Azure ML Registry enables cross-workspace sharing of models, environments, components, and data assets. Use it for MLOps scenarios: develop in dev workspace → promote to staging → deploy in production."
+  },
+  {
+    "question_id": "hard_027",
+    "type": "multiple_choice_single_answer",
+    "question": "You are configuring an AutoML classification job. You want to evaluate models using the area under the ROC curve, weighted by class frequency. Which primary_metric should you set?",
+    "options": [
+      {"id": "A", "text": "accuracy", "is_correct": false, "explanation": "Accuracy measures the proportion of correct predictions but can be misleading with imbalanced datasets."},
+      {"id": "B", "text": "AUC_weighted", "is_correct": true, "explanation": "AUC_weighted computes the area under the ROC curve for each class and then takes the weighted average (weighted by class frequency). This is the best metric for multi-class classification with imbalanced data."},
+      {"id": "C", "text": "f1_score_weighted", "is_correct": false, "explanation": "f1_score_weighted is a valid metric but measures the harmonic mean of precision and recall, not the area under the ROC curve."},
+      {"id": "D", "text": "roc_auc", "is_correct": false, "explanation": "roc_auc is not a valid primary_metric name for Azure ML AutoML. The correct name is AUC_weighted."}
+    ],
+    "feedback": "AutoML classification primary metrics: accuracy, AUC_weighted, norm_macro_recall, average_precision_score_weighted, precision_score_weighted. For regression: normalized_root_mean_squared_error, r2_score, normalized_mean_absolute_error."
+  },
+  {
+    "question_id": "hard_028",
+    "type": "multiple_choice_single_answer",
+    "question": "You deploy a model to a managed online endpoint. The endpoint is returning 5xx errors under heavy load. You want to handle more concurrent requests without deploying a new model version. What should you do?",
+    "options": [
+      {"id": "A", "text": "Increase the instance_count in the deployment configuration", "is_correct": true, "explanation": "Increasing instance_count adds more VM instances behind the endpoint, distributing the load across more machines. This directly increases throughput and reduces 5xx errors caused by overload."},
+      {"id": "B", "text": "Change the auth_mode from 'key' to 'aml_token'", "is_correct": false, "explanation": "Auth mode does not affect capacity or throughput. It only changes how clients authenticate."},
+      {"id": "C", "text": "Register the model with a newer version number", "is_correct": false, "explanation": "Re-registering the model does not change the deployment's capacity. The issue is infrastructure scaling, not model versioning."},
+      {"id": "D", "text": "Change the compute cluster's max_instances", "is_correct": false, "explanation": "Managed online endpoints use instance_type and instance_count, NOT compute clusters. Compute clusters are for training and batch endpoints."}
+    ],
+    "feedback": "Online endpoints scale via instance_count (number of VMs). Batch endpoints scale via compute cluster nodes. If an online endpoint is overloaded, increase instance_count or upgrade instance_type."
+  },
+  {
+    "question_id": "hard_029",
+    "type": "multiple_choice_single_answer",
+    "question": "You use DefaultAzureCredential to authenticate with Azure ML from a local development machine. The authentication fails. You know 'az login' has been run successfully. Which credential method does DefaultAzureCredential try FIRST before falling back to Azure CLI credentials?",
+    "options": [
+      {"id": "A", "text": "InteractiveBrowserCredential", "is_correct": false, "explanation": "InteractiveBrowserCredential is tried much later in the chain, after several other methods fail."},
+      {"id": "B", "text": "EnvironmentCredential", "is_correct": true, "explanation": "DefaultAzureCredential tries in this order: EnvironmentCredential → ManagedIdentityCredential → AzureCliCredential → AzurePowerShellCredential → InteractiveBrowserCredential. EnvironmentCredential checks for AZURE_CLIENT_ID, AZURE_TENANT_ID, and AZURE_CLIENT_SECRET environment variables first."},
+      {"id": "C", "text": "AzureCliCredential", "is_correct": false, "explanation": "AzureCliCredential is third in the chain, after EnvironmentCredential and ManagedIdentityCredential."},
+      {"id": "D", "text": "ManagedIdentityCredential", "is_correct": false, "explanation": "ManagedIdentityCredential is second in the chain. It works on Azure-hosted resources (VMs, App Service) but fails silently on local machines."}
+    ],
+    "feedback": "DefaultAzureCredential order: (1) EnvironmentCredential, (2) ManagedIdentityCredential, (3) AzureCliCredential, (4) AzurePowerShellCredential, (5) InteractiveBrowserCredential. On local machines, it typically resolves to AzureCliCredential."
+  },
+  {
+    "question_id": "hard_030",
+    "type": "multiple_choice_single_answer",
+    "question": "You are defining a CLI v2 YAML file for a command job. Which of the following is a REQUIRED property at the top of the file?",
+    "options": [
+      {"id": "A", "text": "$schema", "is_correct": true, "explanation": "$schema specifies the JSON schema URL for validation and IntelliSense support. While technically jobs can run without it, it is the expected best practice and is included in all official examples and exam scenarios. The schema URL follows the pattern: https://azuremlschemas.azureedge.net/latest/<type>.schema.json"},
+      {"id": "B", "text": "api_version", "is_correct": false, "explanation": "api_version is not a property in CLI v2 YAML files. The API version is determined by the az ml extension version."},
+      {"id": "C", "text": "subscription_id", "is_correct": false, "explanation": "subscription_id is not specified in job YAML files. It comes from az configure defaults or command-line arguments."},
+      {"id": "D", "text": "workspace_name", "is_correct": false, "explanation": "workspace_name is not specified in job YAML files. It's passed via --workspace-name flag or az configure defaults."}
+    ],
+    "feedback": "All CLI v2 YAML files should start with $schema for validation. Examples: commandJob.schema.json, sweepJob.schema.json, pipelineJob.schema.json, environment.schema.json, etc."
+  },
+  {
+    "question_id": "hard_031",
+    "type": "multiple_choice_single_answer",
+    "question": "A data scientist reports that their Responsible AI dashboard in Azure ML shows high error rates for patients over 65. They want to understand WHAT features are driving the model's incorrect predictions for this subgroup. Which RAI component combination should they use?",
+    "options": [
+      {"id": "A", "text": "Error Analysis → then Model Explainability", "is_correct": true, "explanation": "First use Error Analysis to identify and define the subgroup (age > 65) where errors are concentrated. Then use Model Explainability (SHAP values) to understand which features are most influential for that subgroup's predictions. This is the standard investigation workflow."},
+      {"id": "B", "text": "Counterfactual Analysis → then Causal Analysis", "is_correct": false, "explanation": "Counterfactuals show what changes would flip predictions. Causal analysis identifies causal relationships. Neither directly answers 'what features drive incorrect predictions for a subgroup'."},
+      {"id": "C", "text": "Fairness → then Counterfactual Analysis", "is_correct": false, "explanation": "Fairness detects bias across demographic groups but does not explain which features cause errors. Counterfactuals show what changes would alter predictions, not what drives errors."},
+      {"id": "D", "text": "Causal Analysis only", "is_correct": false, "explanation": "Causal Analysis identifies causal relationships but does not help isolate subgroups with high error rates or explain feature importance for those subgroups."}
+    ],
+    "feedback": "RAI investigation workflow: (1) Error Analysis to find problematic subgroups, (2) Model Explainability to understand feature contributions, (3) Counterfactuals for 'what-if' scenarios, (4) Causal Analysis for root causes."
+  },
+  {
+    "question_id": "hard_032",
+    "type": "multiple_choice_single_answer",
+    "question": "You log a model with mlflow.sklearn.log_model(model, 'model'). The resulting MLmodel file lists two flavors: 'sklearn' and 'python_function'. Why are there two flavors?",
+    "options": [
+      {"id": "A", "text": "It's a bug — only one flavor should be listed", "is_correct": false, "explanation": "This is expected behavior, not a bug."},
+      {"id": "B", "text": "Every MLflow model includes the python_function (pyfunc) flavor as a universal interface, plus its native framework flavor", "is_correct": true, "explanation": "MLflow always includes the python_function (pyfunc) flavor alongside the native flavor. The pyfunc flavor provides a universal predict() interface that works across all frameworks, while the native flavor (sklearn, xgboost, etc.) preserves framework-specific methods. This dual-flavor approach enables both generic deployment and framework-specific usage."},
+      {"id": "C", "text": "The sklearn flavor is for training and python_function is for inference only", "is_correct": false, "explanation": "Both flavors can be used for inference. The sklearn flavor gives access to native sklearn methods, while pyfunc provides a generic interface."},
+      {"id": "D", "text": "python_function is added only when you specify a model signature", "is_correct": false, "explanation": "python_function flavor is always added regardless of whether a signature is specified."}
+    ],
+    "feedback": "Every MLflow model has AT LEAST the python_function (pyfunc) flavor. Native flavors (sklearn, xgboost, tensorflow, etc.) are added alongside pyfunc. Use pyfunc for generic deployment, native flavor for framework-specific APIs."
+  },
+  {
+    "question_id": "hard_033",
+    "type": "multiple_choice_single_answer",
+    "question": "You want to use LogUniform distribution for a learning rate hyperparameter in a sweep job. Which sampling algorithm does NOT support LogUniform?",
+    "options": [
+      {"id": "A", "text": "random", "is_correct": false, "explanation": "Random sampling supports all distribution types including LogUniform."},
+      {"id": "B", "text": "grid", "is_correct": false, "explanation": "Grid sampling only supports Choice (discrete values), so it doesn't support LogUniform. However, the question asks specifically about LogUniform incompatibility."},
+      {"id": "C", "text": "bayesian", "is_correct": true, "explanation": "Bayesian sampling only supports Choice, Uniform, and QUniform distributions. LogUniform is NOT supported. Use Random sampling instead when you need LogUniform (common for learning rates)."},
+      {"id": "D", "text": "Both grid and bayesian", "is_correct": false, "explanation": "While grid also doesn't support LogUniform (it only supports Choice), this is a single-answer question and Bayesian is the more commonly tested constraint for continuous distributions."}
+    ],
+    "feedback": "Bayesian sampling supports: Choice, Uniform, QUniform ONLY. Grid supports: Choice ONLY. Random supports: ALL distributions. Use Random for LogUniform learning rates."
+  },
+  {
+    "question_id": "hard_034",
+    "type": "multiple_choice_single_answer",
+    "question": "You create a pipeline job using the @pipeline decorator in Azure ML SDK v2. You define two steps: prep_step and train_step. How do you pass the output of prep_step as input to train_step?",
+    "options": [
+      {"id": "A", "text": "train_step = train_component(training_data=prep_step.outputs.cleaned_data)", "is_correct": true, "explanation": "Inside a @pipeline-decorated function, you can directly reference a step's outputs using dot notation: step_name.outputs.output_name. This creates a data dependency and ensures steps run in the correct order."},
+      {"id": "B", "text": "train_step = train_component(training_data='${{parent.jobs.prep_step.outputs.cleaned_data}}')", "is_correct": false, "explanation": "${{parent.jobs...}} syntax is for CLI v2 YAML pipelines, not the Python @pipeline decorator. In Python, use direct object references."},
+      {"id": "C", "text": "train_step = train_component(training_data=Output(path=prep_step.outputs.cleaned_data))", "is_correct": false, "explanation": "You don't need to wrap the output in an Output() object. Direct reference via prep_step.outputs.cleaned_data is sufficient."},
+      {"id": "D", "text": "pipeline.connect(prep_step.outputs.cleaned_data, train_step.inputs.training_data)", "is_correct": false, "explanation": "There is no pipeline.connect() method in Azure ML SDK v2. Data flow is defined by passing outputs as inputs directly."}
+    ],
+    "feedback": "In @pipeline Python: use step.outputs.name directly. In CLI v2 YAML: use ${{parent.jobs.step.outputs.name}}. Both create data dependencies that control execution order."
+  },
+  {
+    "question_id": "hard_035",
+    "type": "multiple_choice_single_answer",
+    "question": "Your organization has 6 core principles of Responsible AI. A colleague builds a model that performs well overall but produces significantly worse outcomes for a specific ethnic group. Which Responsible AI principle is MOST directly violated?",
+    "options": [
+      {"id": "A", "text": "Transparency", "is_correct": false, "explanation": "Transparency is about making AI systems understandable and explainable. While the bias should be made transparent, the core violation is about fairness."},
+      {"id": "B", "text": "Fairness", "is_correct": true, "explanation": "Fairness requires AI systems to treat all groups equitably without discrimination. A model that produces significantly worse outcomes for a specific ethnic group directly violates the fairness principle."},
+      {"id": "C", "text": "Inclusiveness", "is_correct": false, "explanation": "Inclusiveness is about designing AI that empowers and engages all people. While related, the specific issue of worse outcomes for an ethnic group is most directly a fairness violation."},
+      {"id": "D", "text": "Accountability", "is_correct": false, "explanation": "Accountability means developers are responsible for AI's impact. While developers should be held accountable for the bias, the principle being violated is fairness."}
+    ],
+    "feedback": "6 Responsible AI principles: Fairness, Reliability & Safety, Privacy & Security, Inclusiveness, Transparency, Accountability. Disparate outcomes across demographic groups = Fairness violation."
   }
 ]

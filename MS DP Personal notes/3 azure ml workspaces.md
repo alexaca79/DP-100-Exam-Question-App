@@ -11,9 +11,11 @@ With that in mind, every Azure Service requires a resource group because this is
 After we create a resource group, we are also creating:
 
 1. **Azure storage account**: To store all metadata. We can also connect to other data sources or even other data accounts, databases, and so on.
-2. **Azure key vaults**: To store usernames, passwords, connection strings for data sources.
+2. **Azure Key Vault**: To store usernames, passwords, connection strings for data sources. Uses **Microsoft Entra ID** (formerly Azure Active Directory) for access control.
 3. **Application Insights**: To monitor the deployments of Azure.
-4. **Azure Container registry**: Optional. To store container images that we use to provide environments.
+4. **Azure Container Registry (ACR)**: Optional. To store container images that we use to provide environments. Created automatically when you first build a custom environment or deploy a model.
+
+> **DP-100 Note**: The workspace automatically creates these 4 associated resources. ACR is created on-demand (not at workspace creation) to avoid extra cost until it's needed.
 
 **To create an ML Service**, just create a new resource in the Azure Portal. After that, it will create a new resource group with all the configurations to properly access ML Services.
 
@@ -39,20 +41,49 @@ ml_client.workspaces.begin_create(ws_basic)
 
 # Giving Access to Workspace
 
-- **Owner**: Total access to the Workspace.
+Azure ML uses **Azure Role-Based Access Control (RBAC)** with **Microsoft Entra ID** (formerly Azure AD).
+
+- **Owner**: Total access to the Workspace, including assigning roles to other users.
 - **Contributor**: Full access to all resources but can't grant access to others.
 - **Reader**: Can only view the resources but isn't allowed to make any changes.
 
-With Azure ML workspace, there are *2 unique roles*:
+With Azure ML workspace, there are *2 unique built-in roles*:
 
-- **Azure ML Data Scientist**: Can do anything but manage compute resources or edit workspace settings.
-- **Azure ML Compute Operator**: Allows modifying resources of computing.
+- **AzureML Data Scientist**: Can run experiments, submit jobs, deploy models, register data assets — but CANNOT create/delete compute resources or edit workspace settings. **This is the least-privilege role for a data scientist.**
+- **AzureML Compute Operator**: Can create, modify, and manage compute resources.
 
 You can also create custom roles.
 
-## Using Python SDK for Azure ML
+> **DP-100 Exam Tip**: If asked "What is the minimum role for a data scientist to train and deploy models?" → Answer is **AzureML Data Scientist**. If they also need to create compute → they additionally need **AzureML Compute Operator** or **Contributor**.
 
-1. **Installing**: `pip install azure-ai-ml`
+### Managed Identities (DP-100 important!)
+
+Azure ML supports **System-assigned** and **User-assigned** managed identities:
+
+- **System-assigned**: Automatically created with the resource, tied to its lifecycle
+- **User-assigned**: Created separately, can be shared across resources
+
+Managed identities allow compute to access datastores, Key Vault, ACR etc. without managing credentials.
+
+```python
+from azure.ai.ml.entities import AmlCompute, IdentityConfiguration
+
+# Compute with system-assigned managed identity
+compute = AmlCompute(
+    name="aml-cluster",
+    size="Standard_DS3_v2",
+    min_instances=0,
+    max_instances=4,
+    identity=IdentityConfiguration(type="SystemAssigned")
+)
+ml_client.compute.begin_create_or_update(compute).result()
+```
+
+## Using Python SDK v2 for Azure ML
+
+> **DP-100 Note**: The current SDK is `azure-ai-ml` (SDK v2). The old `azureml-core` (SDK v1) is deprecated and being retired. All exam questions use SDK v2.
+
+1. **Installing**: `pip install azure-ai-ml azure-identity`
 2. **Connecting to a workspace**:
      ```python
      from azure.ai.ml import MLClient
@@ -65,6 +96,8 @@ You can also create custom roles.
              workspace
      )
      ```
+
+> **Important**: `DefaultAzureCredential` tries multiple auth methods in order: Environment variables → Managed Identity → Azure CLI → PowerShell → Interactive browser. It's the recommended default for all scenarios.
 
 ## Using the CLI
 
@@ -234,7 +267,7 @@ The datastore creates a connection between your workspace and the storage but **
 - `container_name`: The name of the container to store blobs in the Azure Storage Account.
 - `credentials`: Provide the method of authentication and the credentials to authenticate. The example below uses an account key.
 
-In previous steps we got the acess key and the storage account name. Now we could use the following code to actually create the datastorage
+In previous steps we got the access key and the storage account name. Now we could use the following code to actually create the datastore
 
 
 ```python
@@ -282,14 +315,14 @@ To point to a specific folder or file in a datastore, you can create data assets
 
 #### URI File creation
 
-We need to sepcify the direct path that points to a specific file. The path can be local path or cloud path.
+We need to specify the direct path that points to a specific file. The path can be local path or cloud path.
 
 In the example below, you'll create a data asset by referencing a local path. To ensure the data is always available when working with the Azure Machine Learning workspace, local files will automatically be uploaded to the default datastore.In this case, the `diabetes.csv` file will be uploaded to **LocalUpload** folder in the **workspaceblobstore** datastore. 
 
-In this case, the project's strucutre is as folows:
+In this case, the project's structure is as follows:
 ![alt text](./pics/image-8.png)
 
-Remember that **we already creaded a datastore called blob_training_data** and we will give a complete path in the azure enviroment to the file where it should be upload
+Remember that **we already created a datastore called blob_training_data** and we will give a complete path in the Azure environment to the file where it should be uploaded
 
 ```python
 from azure.ai.ml.entities import Data
@@ -353,7 +386,7 @@ To create a `MLTable` data asset, you have to specify a path that points to a fo
 > **Note**:
 > Do **not** rename the `MLTable` file to `MLTable.yaml` or `MLTable.yml`. Azure machine learning expects an `MLTable` file.
 
-In the example below, you'll create a data asset by referencing a *local* path which contains an MLTable and CSV file. Againg *note the project¿´s structure* in order to understand the relative paths
+In the example below, you'll create a data asset by referencing a *local* path which contains an MLTable and CSV file. Again, *note the project's structure* in order to understand the relative paths
 
 ```python
 from azure.ai.ml.entities import Data
@@ -399,23 +432,23 @@ df.head(5)
 
 # Compute cost and configuration
 
-Compiute has a cost and one of the main worries within cloud enviroments is cloud-performance prices. To this, it is possible to assign s a compute instance to a user. 
+Compute has a cost and one of the main worries within cloud environments is cloud-performance prices. For this, it is possible to assign a compute instance to a user. 
 
 ``DISCLAIMER!`` A compute instance **can only be assigned to ONE user**
 
-A compute instance can works only in notebooks due the fact it cant handle paralell process.
+A compute instance can work only in notebooks due to the fact it can't handle parallel processes.
 
 ## when to use compute instance?
 
  * When we want to use and host notebooks
- * when we want to work with small process
- * When experimenting with data to small insigths and get familiar with dataset structure
+ * When we want to work with small processes
+ * When experimenting with data for small insights and getting familiar with dataset structure
 
 ## When to use compute cluster
 
- * When experimentation is done and need computational power to run hravy task
+ * When experimentation is done and need computational power to run heavy tasks
  * To run a pipeline job that we created in the *Designer*
- * Tu run AutoMachineLearing Jobs
+ * To run AutoMachineLearning Jobs
  * To Run Script as a job
  * To train different models in parallel
  * 
@@ -423,7 +456,7 @@ A compute instance can works only in notebooks due the fact it cant handle paral
 
 ## Compute selection
 
-When creating a ML service within azure it is recommended to select the compute in function of the products needs. Here is an example of how to configure the computing and so on. Now in order to understand a little bit more about configuration of the computins see this [specific file]("./labs/2 Work with compute.ipynb") in which all the condiguration via SDK in Azure is done. **There is also a good example of how to create a job with compute instances and so on.
+When creating a ML service within Azure it is recommended to select the compute based on the product's needs. Here is an example of how to configure the computing and so on. Now in order to understand a little bit more about configuration of the compute see this [specific file]("./labs/2 Work with compute.ipynb") in which all the configuration via SDK in Azure is done. **There is also a good example of how to create a job with compute instances and so on.
 
 # Compute Example Demo
 
@@ -468,15 +501,15 @@ except Exception:
 cpu_cluster = ml_client.compute.begin_create_or_update(cpu_cluster)
 ```
 
-# Working with Enviroment Docker & CondaYML
+# Working with Environment Docker & Conda YAML
 
-At the very beggining when creating and working with Azure MK we have curated enviroments which are defaulst specs of an enviroment BUT if we would like to customize an enviroment we could use a custom enviroment with a Docker File or a COnda YAML file.
+At the very beginning when creating and working with Azure ML we have curated environments which are default specs of an environment BUT if we would like to customize an environment we could use a custom environment with a Docker File or a Conda YAML file.
 
-Now, the curated enviroments could be used by default and are quite useful regarding all possible scenearios where they will have to be used. With that in mind, let's see some basic comands to see the avialble envirometns or how to create some
+Now, the curated environments could be used by default and are quite useful regarding all possible scenarios where they will have to be used. With that in mind, let's see some basic commands to see the available environments or how to create some
 
-NOTE: A specific enviroment python guide is in the this [notebook]("./labs/2a Work with environments.ipynb) that actually shows in a very precise way how to understand an enviroment configuration within azure platform
+NOTE: A specific environment python guide is in this [notebook]("./labs/2a Work with environments.ipynb) that actually shows in a very precise way how to understand an environment configuration within Azure platform
 
-We already created a job in a previous scrip that is going to be executed.
+We already created a job in a previous script that is going to be executed.
 
 ```python
 from azure.ai.ml import command
@@ -485,7 +518,7 @@ from azure.ai.ml import command
 job = command(
     code="./src",#point to the source directory
     command="python diabetes-training.py", # this script is going to be executed in the job
-    environment="AzureML-sklearn-0.24-ubuntu18.04-py37-cpu@latest", #name of the enviroment used to the job, the env is a docker ./pics/image
+    environment="AzureML-sklearn-0.24-ubuntu18.04-py37-cpu@latest", #name of the environment used for the job, the env is a docker image
     compute="aml-cluster",# computer power
     display_name="diabetes-train-curated-env",
     experiment_name="diabetes-training"
@@ -497,7 +530,7 @@ aml_url = returned_job.studio_url
 print("Monitor your job at", aml_url)
 ```
 
-**And this is how to see actually all the enviroments**
+**And this is how to see actually all the environments**
 
 ```python
 envs = ml_client.environments.list()
@@ -522,7 +555,7 @@ An environment for tasks such as regression, clustering, and classification with
 
 ## Creating our own environment
 
-We could create an enviroment based on a docker file. This is a generall idea of how to do it. We already created with based on a docker file
+We could create an environment based on a docker file. This is a general idea of how to do it. We already created one based on a docker file
 
 ```python
 from azure.ai.ml.entities import Environment

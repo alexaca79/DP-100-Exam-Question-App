@@ -1,6 +1,6 @@
-# Making data vailable
+# Making data available
 
-URIs - Uniform resourcses Identifiers: Basicamnete la location de la data. 
+URIs - Uniform Resource Identifiers: Basically the location of the data. 
 
 There is a protocol to connect URIS for Azure Machine Learning.
 
@@ -17,9 +17,14 @@ There is a protocol to connect URIS for Azure Machine Learning.
 
 This is an abstraction for cloud data sources. They have the info to connect an external data source. This info is usually not in the script of the code.
 
-There are different ways to get som authentication methods. it is something like 
+There are two authentication methods:
 
-storage -> crenditan base / identity based authentication -> SQL/dataGen2/API
+ 1. **Credential-based** (account key, SAS token) — stored in Azure Key Vault
+ 2. **Identity-based** (Microsoft Entra ID / Managed Identity) — recommended for production, no secrets to manage
+
+storage -> credential-based / identity-based authentication -> SQL/dataGen2/API
+
+> **DP-100 Note**: Identity-based authentication using managed identities is the recommended approach. Credential-based auth with account keys works but requires storing secrets.
 
 ## Type of datastores
 
@@ -37,7 +42,7 @@ There are different ways to create datastores with a graphical UX, Azure command
 
 [Para saber mas de Blob Storage, click en este ejemplo](/aux%20examples/BlobStorage.md)
 
-**Example of blob storage connection to connect Azure Blob Storga econainter**
+**Example of blob storage connection to connect Azure Blob Storage container**
 
 ```python
 blob_datastore = AzureBlobDatastore(
@@ -52,23 +57,38 @@ blob_datastore = AzureBlobDatastore(
 ml_client.create_or_update(blob_datastore)
 ```
 
-**Note** This is also possible with a SAS Token (SAS: Some security shit achronymous)
+**Note** This is also possible with a SAS Token (SAS: Shared Access Signature — a token-based auth method that grants limited access to storage resources with an expiry time).
+
+> **DP-100 Note**: You can also create datastores using the **CLI v2** with a YAML file:
+> ```bash
+> az ml datastore create --file datastore.yml
+> ```
+> Or with **identity-based** auth (no keys needed if the workspace managed identity has Storage Blob Data Reader role):
+> ```python
+> blob_datastore = AzureBlobDatastore(
+>     name="blob_example",
+>     account_name="mystestblobstore",
+>     container_name="data-container",
+>     # No credentials — uses workspace managed identity
+> )
+> ml_client.create_or_update(blob_datastore)
+> ```
 
 ## Create a data asset
 
-A data asset is basically a way in that a could acess info needed to compute, train model, etc. There are mainly 3 differentes ways to create a data asset. 
+A data asset is basically a way in that we could access info needed to compute, train model, etc. There are mainly 3 different ways to create a data asset. 
 
 * URI file: Points to a specific file
 
 * URI folder: Points to a specific folder
 
-* MLTable: Points to a foler/file and includes a schema to read as tabular data
+* MLTable: Points to a folder/file and includes a schema to read as tabular data
 
-Assets are particularry usefull when executing machine learning tasks as Azure Machine Learning jobs. Simple think that i can create a data asset as an input/output for a python job in Azure ML.
+Assets are particularly useful when executing machine learning tasks as Azure Machine Learning jobs. Simply think that I can create a data asset as an input/output for a python job in Azure ML.
 
 ### Create a URI file data asset
 
-This points to an specific file. Azure ML only stores the path to the file. This are the possible ways to create a URI file path.
+This points to a specific file. Azure ML only stores the path to the file. These are the possible ways to create a URI file path.
 
 ![alt text](/pics/image-1.png)
 
@@ -107,7 +127,7 @@ print(df.head(10))
 
 ### Create a URI folder data asset
 
-It points to a specific folder. Works similar to URI file and also allows the same path syntaxis
+It points to a specific folder. Works similar to URI file and also allows the same path syntax
 
 **This is how we create a URI folder**
 
@@ -128,7 +148,7 @@ my_data = Data(
 ml_client.data.create_or_update(my_data)
 ```
 
-**NOTE** To propperly give the URI folder to a Azure ML job we first import the data and use as show here:
+**NOTE** To properly give the URI folder to an Azure ML job we first import the data and use as shown here:
 
 ```python
 import argparse
@@ -150,9 +170,11 @@ Este script se usaria por medio de la consola de la siguiente manera:
 python script.py --input_data "/ruta/a/la/carpeta"
 ```
 
-### Craete a MLTable data asset
+### Create a MLTable data asset
 
-MLTable allows to point to tabular data. It is need to specify a schema to read the data. It is useful when you have a schema that's always changing its form and so on. Due this, changing every script is not wise. In that case MLTable is used so, we change directly the schema within the MLTable and not the way that the data is readed itself. 
+MLTable allows to point to tabular data. It is needed to specify a schema to read the data. It is useful when you have a schema that's always changing its form and so on. Due to this, changing every script is not wise. In that case MLTable is used so, we change directly the schema within the MLTable and not the way that the data is read itself. 
+
+> **DP-100 Exam Tip**: AutoML jobs **require** `MLTABLE` data assets. You cannot use `URI_FILE` or `URI_FOLDER` with AutoML. The MLTable file must be in the same directory as the data files. 
 
 To define a schema we include a MLTable file in the same folder as the data we read. This file includes the path the data pointing, how to read it and so on. 
 
@@ -211,6 +233,44 @@ print(df.head(10))
 
 ```bash
 python script_mltable.py --input_data "/ruta/a/la/carpeta"
+```
+
+## Data access modes (DP-100 important!)
+
+When using data assets as job inputs/outputs, you can specify how the data is accessed:
+
+| Mode | Description | Use for |
+|---|---|---|
+| `ro_mount` | Read-only mount (DEFAULT for inputs) | Most input scenarios |
+| `rw_mount` | Read-write mount (DEFAULT for outputs) | Writing results |
+| `download` | Download data to compute node | When mount is slow or unavailable |
+| `upload` | Upload from compute to storage | Output data |
+| `direct` | Pass URI directly, no mount/download | Large datasets, Spark |
+
+```python
+from azure.ai.ml import Input
+# Specify mode explicitly
+training_input = Input(
+    type=AssetTypes.URI_FILE, 
+    path="azureml:diabetes-csv:1",
+    mode="ro_mount"  # default for inputs
+)
+```
+
+> **DP-100 Exam Tip**: `ro_mount` is the default for inputs, `rw_mount` for outputs. Use `download` if mounting is not supported by the storage type.
+
+## CLI v2 — Create data assets
+
+```bash
+az ml data create --file data-asset.yml
+```
+
+```yaml
+$schema: https://azuremlschemas.azureedge.net/latest/data.schema.json
+name: diabetes-csv
+version: 1
+type: uri_file
+path: azureml://datastores/workspaceblobstore/paths/data/diabetes.csv
 ```
 
 # Lab 

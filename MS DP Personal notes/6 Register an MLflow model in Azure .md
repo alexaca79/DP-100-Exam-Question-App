@@ -1,13 +1,17 @@
 # Mlflow model in Azure
 
-Over the time, we create some models and with those files we eventually want them in production. THe way to do is to regiester the model within de Azure ML service. 
+> **Cross-reference**: For the complete MLflow guide, see [9 MLflow comprehensive guide](./9%20MLflow%20comprehensive%20guide.md).
+
+Over the time, we create some models and with those files we eventually want them in production. The way to do it is to register the model within the Azure ML service. 
 
 **MLflow allows to log a model as an artifact or as a model**.
 
-    - As an artifact: The model is treated as a file
-    - AS a model: The model is able to be used directly in a pipeline
+    - As an artifact: The model is treated as a file (just a pkl/file — NO metadata)
+    - AS a model: The model is able to be used directly in a pipeline (includes MLmodel metadata)
 
-**Logging as a model will create a MLmodel file in the output directory. This MLmodel file contains model´s metadta to assure traceability**
+> **DP-100 Exam Tip**: Always use `mlflow.<flavor>.log_model()` instead of `log_artifact()` if you want to deploy the model. Only `log_model` creates the MLmodel file with flavor info, signature, and run_id — which are REQUIRED for no-code deployment to managed endpoints.
+
+**Logging as a model will create a MLmodel file in the output directory. This MLmodel file contains model's metadata to assure traceability**
 
 ![alt text](./pics/image-21.png)
 
@@ -19,13 +23,13 @@ This file could include:
 2. **flavor** which is the library used to created the model
 3. **model_uuid** Name of the model as unique identifier
 4. **run_id** unique identifier of the job in which the model was created
-5. **signature**Specifies the schema of the model´s input and output
-   1. *inputs* Valid input to the model such as a valid subset to trainning a model
+5. **signature** Specifies the schema of the model's input and output
+   1. *inputs* Valid input to the model such as a valid subset for training a model
    2. *outputs* valid output to the model for example, model predictions for the input dataset
 
 ### DEMO how to do it
 
-Think anout the next code as a script job to do some machine learning. Of course it is incomplete but as we see in the imports, **LogisticREgression** from **sklearn** is the main function to train the model. With that in mind, it could be simply to notice that the first artgument in the main function is the ``mlflow.autolog()`` statement. This basicallly uses the autolog function in the Azure ML services. We already studied that. 
+Think about the next code as a script job to do some machine learning. Of course it is incomplete but as we see in the imports, **LogisticRegression** from **sklearn** is the main function to train the model. With that in mind, it could be simple to notice that the first argument in the main function is the ``mlflow.autolog()`` statement. This basically uses the autolog function in the Azure ML services. We already studied that. 
 ```python
 # import libraries
 import mlflow
@@ -72,7 +76,7 @@ def split_data(df):
 ```
 
 
-**Specify flavor** To do so, it's quite simple. Code will stay the same BUT now the mlflow function will recieve another parameter. 
+**Specify flavor** To do so, it's quite simple. Code will stay the same BUT now the mlflow function will receive another parameter. 
 
 ```python
 def main(args):
@@ -123,10 +127,10 @@ def main(args):
     # evaluate model
     y_hat = eval_model(model, X_test, y_test)
 
-    # create the signature by inferring it from the datasets. In this case  inferring the idea that the model use a X_train as an input and will give an y_hay as an output
+    # create the signature by inferring it from the datasets. In this case inferring the idea that the model uses X_train as an input and will give a y_hat as an output
     signature = infer_signature(X_train, y_hat)
 
-    # manually log the model: And with the flavour, we give the moedl a signature
+    # manually log the model: And with the flavour, we give the model a signature
     mlflow.sklearn.log_model(model, "model", signature=signature)
 
 ...
@@ -207,7 +211,7 @@ from azure.ai.ml import command
 job = command(
     code="./src",
     command="python train-model-signature.py --training_data diabetes.csv",
-    environment="AzureML-sklearn-0.24-ubuntu18.04-py37-cpu@latest",
+    environment="AzureML-sklearn-1.0-ubuntu20.04-py38-cpu@latest",
     compute="aml-cluster",
     display_name="diabetes-train-signature",
     experiment_name="diabetes-training"
@@ -253,6 +257,18 @@ To create a proper dashboard we need to first create a pipeline with a model wit
  * A ML model already registered in Azure ML
  * Train and test datasets as MLTables
  * Access to a Azure ML workspace and a compute cluster
+
+## RAI Dashboard Components (DP-100 updated)
+
+| Component | Purpose |
+|---|---|
+| **Error Analysis** | Identify cohorts/subgroups where model performs poorly |
+| **Model Explainability** | Feature importance (SHAP values), global + local explanations |
+| **Counterfactuals** | "What-if" analysis — what input changes would flip prediction |
+| **Causal Analysis** | Identify causal relationships (not just correlations) |
+| **Fairness** | Detect bias across demographic groups |
+
+> **DP-100 Exam Tip**: Error Analysis helps you find **subgroups** where the model fails. Counterfactuals answer "what would need to change for a different prediction?" Causal analysis answers "what actually causes the outcome?"
 
 ## Getting integrated components
 
@@ -336,4 +352,4 @@ ml_client.jobs.create_or_update(pipeline_job)
 ```
 ## Reviewing the dashboard
 
-Now in the Azure ML service we could see in **models -> dashboard** all the results of the pipeline and the dashboard with the propper analyisis such as feature imporatance and so on.
+Now in the Azure ML service we could see in **models -> dashboard** all the results of the pipeline and the dashboard with the proper analysis such as feature importance and so on.

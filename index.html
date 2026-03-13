@@ -146,13 +146,50 @@
 let allQuestions=[], sessionQuestions=[], currentIndex=0, score=0, answered=0, wrongIds=[], activeFilter='all', selectedOptions=new Set(), currentOrder=[], dragSrcIdx=null;
 const TYPES={multiple_choice_single_answer:{label:'Single',cls:'mc'},multiple_choice_multiple_answer:{label:'Multi',cls:'multi'},ordering:{label:'Order',cls:'order'},drag_and_drop_ordering:{label:'Select',cls:'drag'},true_false:{label:'T/F',cls:'tf'}};
 
-fetch('questions.json').then(r=>r.json()).then(data=>{
+function loadJSON(){
+  // Try fetch first (works when served via HTTP)
+  return fetch('questions.json').then(r=>{
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }).catch(fetchErr=>{
+    // Fallback: try XMLHttpRequest (works in some browsers with file://)
+    return new Promise((resolve,reject)=>{
+      const xhr=new XMLHttpRequest();
+      xhr.open('GET','questions.json',true);
+      xhr.onload=function(){
+        if(xhr.status===200||xhr.status===0){
+          try{resolve(JSON.parse(xhr.responseText));}catch(e){reject(e);}
+        } else reject(new Error('XHR '+xhr.status));
+      };
+      xhr.onerror=function(){reject(fetchErr);};
+      xhr.send();
+    });
+  });
+}
+
+loadJSON().then(data=>{
   allQuestions=shuffle(data);
   document.getElementById('loading').style.display='none';
   document.getElementById('quiz-screen').style.display='block';
   buildFilters(); startSession();
 }).catch(err=>{
-  document.getElementById('loading').innerHTML=`<div class="load-text" style="color:var(--red)">Error loading questions.json<br>${err.message}</div>`;
+  document.getElementById('loading').innerHTML=`
+    <div class="load-text" style="color:var(--red);text-align:center;max-width:500px">
+      <div style="font-size:14px;margin-bottom:16px">Cannot load questions.json</div>
+      <div style="color:var(--text-dim);font-size:12px;line-height:1.8">
+        If you opened this file directly, browsers block JSON loading from <code style="color:var(--accent)">file://</code>.<br><br>
+        <span style="color:var(--text)">Fix: serve it with a local server:</span><br>
+        <code style="color:var(--green);background:var(--surface2);padding:4px 10px;border-radius:4px;display:inline-block;margin-top:6px">python serve.py</code><br>
+        <span style="color:var(--text-muted);font-size:11px;margin-top:4px;display:inline-block">or: python -m http.server 8080</span>
+      </div>
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+        <div style="color:var(--text-dim);font-size:11px;margin-bottom:8px">Or load the file manually:</div>
+        <label style="display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 20px;cursor:pointer;color:var(--accent);font-size:12px">
+          SELECT questions.json
+          <input type="file" accept=".json" style="display:none" onchange="manualLoad(this)">
+        </label>
+      </div>
+    </div>`;
 });
 
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -335,6 +372,24 @@ function showResults(){
 
 function setsEq(a,b){if(a.size!==b.size)return false;for(const x of a)if(!b.has(x))return false;return true;}
 function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function manualLoad(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      allQuestions=shuffle(data);
+      document.getElementById('loading').style.display='none';
+      document.getElementById('quiz-screen').style.display='block';
+      buildFilters(); startSession();
+    }catch(err){
+      alert('Invalid JSON: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+}
 </script>
 </body>
 </html>

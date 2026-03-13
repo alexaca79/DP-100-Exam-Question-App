@@ -1,5 +1,7 @@
 # Azure AI services
 
+> **DP-100 Note**: The DP-100 exam now includes questions about generative AI concepts in the context of Azure ML, including Azure AI Foundry, model catalog, prompt flow, RAG patterns, and fine-tuning. This section covers those topics.
+
 Microsoft offers different services related to AI. To use these services, you need to specify resources for these tasks.
 
  * Azure OpenAI: GPT family, DALL-E, and so on
@@ -44,14 +46,16 @@ Project level roles are:
 
 ## Responsible AI
 
-Some shit-hippie speach about responsible AI. Here are thecore principles of responsible AI:
+The core principles of responsible AI (these are tested on DP-100!):
  
- * Fairness: AI models should not discriminate against any group of people.
- * Reliability and Safety: AI models should not cause harm to people or the environment. Tesla car for example.
- * Privacy and Security: AI models should not collect or use personal data without the user's consent. Keep your data safe.
- * Inclusiveness: AI systems should empower everyone and engage people. AI should bring benefits to all parts of society, regardless of physical ability, gender, sexual orientation, ethnicity, or other factors.
- * Transparency: AI models should be transparent and explainable. Should be understandable by humans. AI systems should be understandable. Users should be made fully aware of the purpose of the system, how it works, and what limitations may be expected.
-* Accountability: AI models should be accountable for their actions. Developers who trained and validated models are the ones to be held responsible for the consequences of their actions.
+ * **Fairness**: AI models should not discriminate against any group of people.
+ * **Reliability and Safety**: AI models should not cause harm to people or the environment.
+ * **Privacy and Security**: AI models should not collect or use personal data without the user's consent. Keep your data safe.
+ * **Inclusiveness**: AI systems should empower everyone and engage people. AI should bring benefits to all parts of society, regardless of physical ability, gender, sexual orientation, ethnicity, or other factors.
+ * **Transparency**: AI models should be transparent and explainable. Should be understandable by humans. Users should be made fully aware of the purpose of the system, how it works, and what limitations may be expected.
+ * **Accountability**: AI models should be accountable for their actions. Developers who trained and validated models are the ones to be held responsible for the consequences of their actions.
+
+> **DP-100 Exam Tip**: Know ALL 6 principles: Fairness, Reliability & Safety, Privacy & Security, Inclusiveness, Transparency, Accountability. The exam may describe a scenario and ask which principle applies.
 
 ### First lab about gen AI
 
@@ -61,20 +65,20 @@ In this exercise, you use Azure AI Foundry portal to create a hub and project, r
 # Model catalog in azure AI Foundry
 
 There are many models, you can select them from Hugging Face, Open AI, Azure Open AI, etc. Now, azure AI Foundry has a catalog of models that you can use. There are some criteiria to select a model to use:
- * large vs Small models: Large models are more powerful but also more expensive. GPT-4, Mistral Large, Llama3 405Bare **LLM** 
- Small models are cheaper but less powerful. Phi3, Mistral OSS, Llama 38B are small models examples.
- * Task or tool: Some models are better for text generation, some for image generation, some for translation, etc. Depending on the model we will require to select an specific one. For example advanced reasioning, math, science, text generation, we could use **DeepSeek-R1** or **o1**.
- Some models are multi modal, meaning the can be used for image generation, text generation, etc.Models like GPT-4o family and Phi3-vision ara capables of both analyzing aand generating images and text.
+ * large vs Small models: Large models are more powerful but also more expensive. GPT-4, Mistral Large, Llama3 405B are **LLM** 
+ Small models are cheaper but less powerful. Phi3, Mistral OSS, Llama 38B are small model examples.
+ * Task or tool: Some models are better for text generation, some for image generation, some for translation, etc. Depending on the model we will require to select a specific one. For example advanced reasoning, math, science, text generation, we could use **DeepSeek-R1** or **o1**.
+ Some models are multi modal, meaning they can be used for image generation, text generation, etc. Models like GPT-4o family and Phi3-vision are capable of both analyzing and generating images and text.
  Dall-E 3 is a good example to generate images. 
-* model by region: Some models are better to an specifici region like Core42 JAIS; which is an Arabic LLM making best choice to transalte to Arabic. Mistral LArge has a strong focus on European models. 
+* model by region: Some models are better for a specific region like Core42 JAIS; which is an Arabic LLM making best choice to translate to Arabic. Mistral Large has a strong focus on European models. 
 
 ### Model selection criteria
 
 To select the best language model for you use case, you need to decide on what criteria you're using to filter the models
 
  * ``task type``: Text only? Images? Translation?
- * ``Precision``: What is the precision of the model? Is it good enough to achgive the task? does it need fine tunning wth training with an specific dataset? In generative AI, precision refers to the accuracy of the model in generating correct and relevant outputs. It measures the proportion of true positive results (correct outputs) among all generated outputs. High precision means fewer irrelevant or incorrect results, making the model more reliable.
- * ``Openness``: Want to fine tune it by youtself?
+ * ``Precision``: What is the precision of the model? Is it good enough to achieve the task? Does it need fine tuning with training with a specific dataset? In generative AI, precision refers to the accuracy of the model in generating correct and relevant outputs. It measures the proportion of true positive results (correct outputs) among all generated outputs. High precision means fewer irrelevant or incorrect results, making the model more reliable.
+ * ``Openness``: Want to fine tune it by yourself?
  * ``Deployment``: Do you need to deploy it to an endpoint? Locally?
  * ``Performance``: When you're exploring models through the Azure AI Foundry model catalog, you can use model benchmarks to compare publicly available metrics like coherence and accuracy across models and datasets. These benchmarks can help you in the initial exploration phase, but give little information on how the model would perform in your specific use case.
 
@@ -98,7 +102,19 @@ AI solutions could vary depending on the needs of the application that is being 
  3. Get endpoint details: Once the model is deployed, get the URI endpoint and authentication keys.
  4. Consume model from an app: Use URI and keys to provide requests to the model. Requests should include input data and how the model should process it.
 
-The idea is quiet simple, you use a model deployed in a endpoint to consume it from an app. Make request to the endpoint and get the response. 
+### Deployment Types (DP-100 important)
+
+| Type | Description | Cost Model |
+|---|---|---|
+| **Global Standard** | Multi-region, highest availability | Pay-per-token |
+| **Standard** | Single-region deployment | Pay-per-token |
+| **Provisioned** | Reserved throughput, consistent latency | Hourly rate |
+| **Serverless API (MaaS)** | Model-as-a-Service, per-model endpoint | Pay-per-token |
+| **Managed Compute** | Deploy on custom infrastructure | Compute + hosting |
+
+> **DP-100 Exam Tip**: Serverless API (Model-as-a-Service) requires no infrastructure management. Managed compute gives full control but requires managing VMs.
+
+The idea is quite simple, you use a model deployed in an endpoint to consume it from an app. Make requests to the endpoint and get the response. 
 
 ![alt text](pics/api-response.png)
 
@@ -126,9 +142,9 @@ The URI includes:
 
 ## Optimize model performance
 
-After you deploy your model to an endpoint, you can start interacting with it to see how it works. Some useful techquiniques are:
+After you deploy your model to an endpoint, you can start interacting with it to see how it works. Some useful techniques are:
 
- * ```Promt engineering```: Clear instructions, structured format of headers, and keywords to guide a response.
+ * ```Prompt engineering```: Clear instructions, structured format of headers, and keywords to guide a response.
  * ``Ask model to act as a specific persona``: For example, you can ask the model to act as a customer service representative.
  * ``Ask for better question suggestions``
  * ``Specify the desired format for responses``: When you want the model to generate output in a specific format, you can provide a template or structure in your prompt.
@@ -141,7 +157,7 @@ The Azure AI Foundry model catalog serves as a central repository where you can 
 
 [link to the lab](https://microsoftlearning.github.io/mslearn-ai-studio/Instructions/02-Explore-model-catalog.html)
 
-**There are other other model optimizations such as Retrieval Augmented genration (RAG) or Fine-Tunning** that could be used to improve the model performance.
+**There are other model optimizations such as Retrieval Augmented Generation (RAG) or Fine-Tuning** that could be used to improve the model performance.
 
 But **before deploying a model** you should ensure how to optimize it. Here is a list of tasks to improve model performance *before deployment*:
 
@@ -184,10 +200,10 @@ The "AIProjectClient" is the main object to interact with AI projects. It allows
 
 ## Project connections
 
-With Azure AI Foundry SDK we create a **AIProjectClient** in Python with some **connections** property, which allows to acess te resources in the project. Methods of connections object include:
+With Azure AI Foundry SDK we create a **AIProjectClient** in Python with some **connections** property, which allows to access the resources in the project. Methods of connections object include:
 
  * ``connections.list()``: List all connections in the project. Could alse filter by connection_type parameter with a valid numeration, such as ``ConnectionType.AZURE_AI_SERVICE``.
- * ``connections.get(connection_name, include_credentials=True)``:Returns a connection object for the connection with the name specified. If the include_credentials parameter is True (the default value), the credentials required to connect to the connection are returned - for example, in the form of an API key for an Azure AI services resource.
+ * ``connections.get(connection_name, include_credentials=True)``: Returns a connection object for the connection with the name specified. If the include_credentials parameter is True (the default value), the credentials required to connect to the connection are returned - for example, in the form of an API key for an Azure AI Services resource.
  * ``connections.get_default(connection_type, include_credentials)``: Returns the default connection of the specified type - for example, the default Azure AI services connection defined in the project.
  
 ### Quick example
@@ -464,7 +480,7 @@ By representing words and their meanings with vectors, you can extract relevant 
 ![alt text](./pics/image-30.png)
 
 ``Search index creation``
-To propperly implement something like this it is needed to create a **search index** in the Azure AI search. 
+To properly implement something like this it is needed to create a **search index** in the Azure AI Search. 
 
 ![alt text](./pics/image-31.png)
 
