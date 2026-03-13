@@ -3,6 +3,7 @@ __pycache__/
 *.pyo
 .vscode/
 .idea/
+.streamlit/
 *.egg-info/
 dist/
 build/
