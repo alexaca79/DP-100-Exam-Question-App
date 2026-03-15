@@ -1,377 +1,256 @@
 # 14 DP-100 Weak Areas — Targeted Review
 
-Based on practice assessment (60% score, March 15 2026). This covers every question you got wrong with decision tables and the exact reasoning.
+Practice assessment score: 60%. These are the 4 areas flagged for improvement with decision tables and MS Learn links.
 
 ---
 
-## SECTION 1: Data & Datasets — What Creates What?
+## AREA 1: Design and Prepare a Machine Learning Solution
 
-You missed: **Q6** (dataset vs pipeline for metadata reference)
+### Data Assets vs Datastores vs Pipelines
 
-| What you want | What to use | Why |
+| Concept | What it does | Creates a copy of data? |
 |---|---|---|
-| Reference to data WITH metadata copy, NO data copy | **Create a data asset (dataset)** | Stores pointer + metadata only |
-| Move/transform data between services | **Azure Data Factory / Pipeline** | ETL process, copies data |
-| Store connection info to external storage | **Register a datastore** | Connection only, no metadata |
-| Process data in a workflow | **Pipeline job** | Multi-step processing |
+| **Data asset (dataset)** | Reference to data + metadata copy | No — pointer only |
+| **Datastore** | Connection info to storage (Blob, ADLS, SQL) | No — connection only |
+| **Pipeline** | Multi-step ML workflow | Depends on steps |
+| **Azure Data Factory** | ETL — moves/transforms data | Yes |
 
-> **Key insight**: A data asset = pointer + metadata. Datastore = connection. Pipeline = workflow. These are 3 DIFFERENT things.
+**When to use which:**
 
-**MS Learn**: [Make data available in Azure Machine Learning](https://learn.microsoft.com/training/modules/make-data-available-azure-machine-learning/)
+| I need to... | Use |
+|---|---|
+| Point to data + store metadata, no copy | **Data asset** |
+| Connect to an external storage account | **Datastore** |
+| Run a multi-step training workflow | **Pipeline job** |
+| Move data between services | **Azure Data Factory** |
+
+### Compute Types — When to Use What
+
+| Scenario | Compute Type | Class |
+|---|---|---|
+| Single dev VM, notebooks, 1 user | Compute Instance | `ComputeInstance` |
+| Multi-node cluster for training (1-N nodes) | Compute Cluster | `AmlCompute` |
+| Already have an Azure VM | Attached compute | N/A |
+| No infra to manage | Serverless | N/A |
+
+> `ComputeInstance` = ALWAYS 1 node. If the question mentions multiple nodes/instances → `AmlCompute`.
+
+### Data Access Modes
+
+| Mode | Default for | Description |
+|---|---|---|
+| `ro_mount` | Inputs | Read-only mount |
+| `rw_mount` | Outputs | Read-write mount |
+| `download` | N/A | Copy all data to local disk |
+| `upload` | N/A | Write data to storage |
+| `direct` | N/A | Pass URI only (for Spark/large data) |
+
+### MS Learn for this section:
+- [Make data available in Azure Machine Learning](https://learn.microsoft.com/training/modules/make-data-available-azure-machine-learning/)
+- [Work with compute targets](https://learn.microsoft.com/training/modules/use-compute-contexts-in-aml/)
+- [Data concepts in Azure ML](https://learn.microsoft.com/azure/machine-learning/concept-data)
 
 ---
 
-## SECTION 2: MLflow — Which Method Does What?
+## AREA 2: Explore Data and Run Experiments
 
-You missed: **Q9** (set tracking URI first), **Q14** (get_run vs log_artifact for retrieval)
-
-### MLflow Setup Order (LOCAL environment)
+### MLflow — Setup Order (from local machine)
 
 ```
 1. mlflow.set_tracking_uri(uri)   ← FIRST (connect to workspace)
-2. mlflow.set_experiment("name")  ← SECOND (set experiment)
+2. mlflow.set_experiment("name")  ← SECOND (name the experiment)
 3. mlflow.start_run()             ← THIRD (begin logging)
 ```
 
-> **Q9 trap**: Inside Azure ML jobs, tracking URI is auto-set. From LOCAL → you MUST set it first.
+> Inside Azure ML jobs → tracking URI is set AUTOMATICALLY. From local → YOU must set it first.
 
-### MLflow Methods Decision Table
+### MLflow Methods — Read vs Write
 
-| I want to... | Method | Returns |
+| I want to... | Method | Action |
 |---|---|---|
-| **Log** a parameter (input) | `mlflow.log_param("key", val)` | Nothing |
-| **Log** a metric (output) | `mlflow.log_metric("key", val)` | Nothing |
-| **Log** a file/plot | `mlflow.log_artifact("file.png")` | Nothing |
-| **Log** everything automatically | `mlflow.autolog()` | Nothing |
-| **Save** model versions | `mlflow.register_model()` | Model version |
-| **Retrieve** run metadata, metrics, params | `MlflowClient().get_run(run_id)` | Run object with .data.metrics, .data.params |
-| **Search** across runs | `mlflow.search_runs()` | DataFrame |
+| Log a parameter (input config) | `mlflow.log_param("key", val)` | **Write** |
+| Log a metric (output number) | `mlflow.log_metric("key", val)` | **Write** |
+| Log a file/plot | `mlflow.log_artifact("file.png")` | **Write** |
+| Log everything automatically | `mlflow.autolog()` | **Write** |
+| Save model versions to registry | `mlflow.register_model()` | **Write** |
+| **Retrieve** run metadata/metrics | `MlflowClient().get_run(id)` | **Read** |
+| **Search** across multiple runs | `mlflow.search_runs()` | **Read** |
 
-> **Q14 trap**: `log_artifact()` WRITES data. `get_run()` READS data. Don't confuse logging (write) with retrieval (read).
+> `log_*` methods = WRITE. `get_run()` / `search_runs()` = READ. Don't mix them up.
 
-**MS Learn**: [Track ML experiments and models with MLflow](https://learn.microsoft.com/training/modules/train-models-training-mlflow-jobs/)
+### Hyperparameter Tuning — Sampling Algorithms
 
----
-
-## SECTION 3: Compute — Which Class for What?
-
-You missed: **Q10** (AmlCompute vs ComputeInstance for 4-node cluster)
-
-| Scenario | Class | Why |
+| Algorithm | When to use | Supports |
 |---|---|---|
-| Single dev VM, notebooks, 1 user | `ComputeInstance` | Single node ONLY, can't scale |
-| Multi-node cluster for training | `AmlCompute` | Supports 1-N nodes, auto-scale |
-| External VM you already have | Attached compute | Bring your own |
-| No infra management needed | Serverless compute | Pay per job |
-| Real-time endpoint hosting | `ManagedOnlineEndpoint` | Not a training compute |
+| **Grid** | Small space, try ALL combos | `Choice` only |
+| **Random** | Large space, need speed | ALL distributions |
+| **Bayesian** | Informed search, fewer trials | `Choice`, `Uniform`, `QUniform` only |
 
-> **Q10 trap**: `ComputeInstance` = ALWAYS 1 node. Question said "4 instances" → must be `AmlCompute`.
+> "Large search space + minimize time" → **Random** (not Grid). Grid is the slowest.
 
-### Decision flow:
-```
-Need multiple nodes? → AmlCompute
-Need just 1 VM for dev? → ComputeInstance
-Have an existing VM? → Attached compute
-Need GPU? → AmlCompute with GPU VM size
-```
+### Distributions — Continuous vs Discrete
 
-**MS Learn**: [Work with compute targets](https://learn.microsoft.com/training/modules/use-compute-contexts-in-aml/)
-
----
-
-## SECTION 4: Running Scripts — SDK v2 Classes
-
-You missed: **Q23** (command vs environment for running scripts)
-
-| I want to... | Class/Function | Package |
-|---|---|---|
-| **Run** a training script as a job | `command()` | `azure.ai.ml` |
-| **Define** packages/Docker for a job | `Environment()` | `azure.ai.ml.entities` |
-| **Define** data inputs for a job | `Input()` | `azure.ai.ml` |
-| **Register** a trained model | `Model()` | `azure.ai.ml.entities` |
-| **Create** a compute cluster | `AmlCompute()` | `azure.ai.ml.entities` |
-| **Submit** any job | `ml_client.jobs.create_or_update(job)` | `azure.ai.ml` |
-
-> **Q23 trap**: `Environment` defines WHERE the script runs (packages). `command()` is HOW you run the script. The question asked "run a script" → answer is `command`.
-
-```python
-# The command() function is the entry point for running scripts
-job = command(
-    code="./src",                          # folder with script
-    command="python train.py",             # what to execute
-    environment="AzureML-sklearn@latest",  # Environment (packages)
-    compute="aml-cluster"                  # Compute (hardware)
-)
-ml_client.jobs.create_or_update(job)       # Submit
-```
-
-**MS Learn**: [Run a training script as a command job](https://learn.microsoft.com/training/modules/run-training-script-command-job-azure-machine-learning/)
-
----
-
-## SECTION 5: Hyperparameter Tuning — Sampling & Distributions
-
-You missed: **Q17** (Grid vs Random for large space), **Q19** (continuous vs discrete distributions)
-
-### Sampling Algorithm Decision Table
-
-| Scenario | Algorithm | Why |
-|---|---|---|
-| Try ALL combinations (small space) | **Grid** | Exhaustive, only `Choice` |
-| Large space, need speed | **Random** | Fast, supports ALL distributions |
-| Informed search, use past results | **Bayesian** | Smart, only `Choice/Uniform/QUniform` |
-| Best coverage, not truly random | **Sobol** (Random variant) | More uniform than pure random |
-
-> **Q17 trap**: "Large search space + find optimal quickly + minimize time" → **Random**, not Grid. Grid tries EVERYTHING = slowest.
-
-### Distribution Types — Continuous vs Discrete
-
-| Distribution | Type | Use for |
-|---|---|---|
-| `Uniform` | **Continuous** | Evenly spread real values |
-| `Normal` | **Continuous** | Bell curve, real values |
-| `LogUniform` | **Continuous** | Learning rates (orders of magnitude) |
-| `LogNormal` | **Continuous** | Log-scale bell curve |
-| `Choice` | **Discrete** | Pick from a list |
-| `Randint` | **Discrete** | Random integer |
-| `QUniform` | **Discrete** | Quantized (rounded) uniform |
-| `QNormal` | **Discrete** | Quantized (rounded) normal |
-| `QLogUniform` | **Discrete** | Quantized log-uniform |
-| `QLogNormal` | **Discrete** | Quantized log-normal |
-
-> **Q19 trap**: Question said "continuous" → `Normal`, `Uniform`, `LogUniform`, `LogNormal`. The "Q" prefix = quantized = **discrete**.
-
-### Quick rule:
-- **No Q prefix** → Continuous (Normal, Uniform, LogUniform)
-- **Q prefix** → Discrete/Quantized (QNormal, QUniform, QLogNormal)
-- **Choice/Randint** → Always discrete
-
-**MS Learn**: [Hyperparameter tuning a model (v2)](https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters)
-
----
-
-## SECTION 6: Pipelines — Passing Data, Scheduling, Components
-
-You missed: **Q26** (monitoring), **Q27** (passing data), **Q28** (cron), **Q29** (component YAML)
-
-### Pipeline Monitoring
-
-| Action | Where |
+| Continuous (no Q prefix) | Discrete (Q prefix or Choice) |
 |---|---|
-| Submit pipeline | Authoring page (SDK, CLI, or Studio) |
-| Monitor status | **Jobs page → submission list → click job link** |
-| NOT here | Authoring page does NOT show job status |
+| `Uniform` | `QUniform` |
+| `Normal` | `QNormal` |
+| `LogUniform` | `QLogUniform` |
+| `LogNormal` | `QLogNormal` |
+| — | `Choice` |
+| — | `Randint` |
 
-> **Q26 trap**: After submitting, go to **Jobs page**, not back to the authoring page.
+> **Rule**: Q prefix = Quantized = Discrete. No Q prefix = Continuous.
 
-### Passing Data Between Steps
+### Early Termination Policies
 
-**SDK v2** (current exam focus):
+| Policy | Stops runs that are... | Key param |
+|---|---|---|
+| **BanditPolicy** | Worse than best by `slack_factor`/`slack_amount` | `slack_amount=0.35` → 35% worse |
+| **MedianStoppingPolicy** | Worse than the median of all runs | `evaluation_interval` |
+| **TruncationSelectionPolicy** | In the bottom X% | `truncation_percentage` |
+
+> `delay_evaluation` = wait N intervals before applying any policy (lets trials warm up).
+
+### MS Learn for this section:
+- [Track ML experiments with MLflow](https://learn.microsoft.com/training/modules/train-models-training-mlflow-jobs/)
+- [Find the best model with Automated ML](https://learn.microsoft.com/training/modules/automate-model-selection-with-azure-automl/)
+- [Hyperparameter tuning a model (v2)](https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters)
+
+---
+
+## AREA 3: Train and Deploy Models
+
+### Running Scripts in SDK v2
+
+| I want to... | Use | Not this |
+|---|---|---|
+| **Run** a script as a job | `command()` | ~~Environment~~ |
+| **Define** packages for a job | `Environment()` | ~~command~~ |
+| **Define** input data | `Input()` | ~~Output~~ |
+| **Submit** the job | `ml_client.jobs.create_or_update()` | — |
+
+> `command()` = how to RUN. `Environment()` = packages/Docker WHERE it runs. Different things.
+
+### Pipelines
+
+**Monitoring**: After submitting → go to **Jobs page → submission list**. The authoring page does NOT show job status.
+
+**Passing data between steps (SDK v2)**:
 ```python
-@pipeline(default_compute="aml-cluster")
-def my_pipeline(raw_data):
-    prep_step = prep_component(input_data=raw_data)
-    train_step = train_component(
-        training_data=prep_step.outputs.cleaned_data  # ← output → input
-    )
+prep_step = prep_component(input_data=raw_data)
+train_step = train_component(training_data=prep_step.outputs.cleaned_data)
 ```
 
-**SDK v1** (still tested! Q27 was SDK v1):
-```python
-prepped_data = OutputFileDatasetConfig('prepped')  # ← MUST define this first
-
-step1 = PythonScriptStep(name="Prepare",
-    arguments=['--out_folder', prepped_data])
-
-step2 = PythonScriptStep(name="Train",
-    arguments=['--training-data', prepped_data.as_input()])  # ← .as_input()
+**Cron scheduling**:
 ```
-
-> **Q27 trap**: You MUST create `OutputFileDatasetConfig` BEFORE defining the steps. The wrong answer was missing this definition.
-
-### Cron Syntax for Scheduling
-
+minute  hour  day_of_month  month  day_of_week
+  15     13       *           *        3         ← Wednesday 1:15 PM
 ```
-┌──── minute (0-59)
-│ ┌── hour (0-23)
-│ │ ┌── day of month (1-31)
-│ │ │ ┌── month (1-12)
-│ │ │ │ ┌──── day of week (0=Sun, 1=Mon, ..., 6=Sat)
-│ │ │ │ │
-* * * * *
-```
+Days: 0=Sun, 1=Mon, 2=Tue, **3=Wed**, 4=Thu, 5=Fri, 6=Sat
 
-| Schedule | Cron Expression |
+**Component YAML — ALL 4 required**: metadata + inputs + outputs + environment
+
+### Scoring Script (for endpoints)
+
+| Function | Called when | Purpose |
+|---|---|---|
+| `init()` | **Once** at startup | Load model into memory |
+| `run(data)` | **Each request** | Process data + return predictions |
+
+> `init()` loads model. `run()` does inference. Feature engineering on incoming data → put it in `run()`.
+
+### Endpoint vs Deployment
+
+| Class | What it defines |
 |---|---|
-| Every day at 1:15 PM | `15 13 * * *` |
-| Every Wednesday at 1:15 PM | `15 13 * * 3` |
-| Every Monday at 9:00 AM | `0 9 * * 1` |
-| Every 1st of month at midnight | `0 0 1 * *` |
-| Every weekday at 6:30 AM | `30 6 * * 1-5` |
+| `ManagedOnlineEndpoint` | URL + auth mode + traffic routing |
+| `ManagedOnlineDeployment` | Model + VM size + instance count + environment + scoring script |
 
-> **Q28 trap**: Wednesday = `3` (0=Sun, 1=Mon, 2=Tue, **3=Wed**). The wrong answer had `*` (every day) instead of `3`.
+> If the question mentions `instance_type`, `environment`, `scoring_script` → that's a **Deployment** property, not an Endpoint.
 
-### Component YAML — Required Sections
+### Batch Endpoints
 
-| Section | Required? | What it defines |
-|---|---|---|
-| `name`, `display_name`, `type` | **Yes** | Metadata of the component |
-| `inputs` | **Yes** | What data/params the component receives |
-| `outputs` | **Yes** | What data the component produces |
-| `environment` | **Yes** | Docker + conda for execution |
-| `code` | **Yes** | Path to the script |
-| `command` | **Yes** | How to run the script |
+| Setting | Purpose |
+|---|---|
+| `mini_batch_size` | Records per mini-batch (e.g., 50) |
+| `instance_count` | Number of nodes |
+| `output_action` | `APPEND_ROW` (single CSV) or `SUMMARY_ONLY` |
+| `max_concurrency_per_instance` | Parallel processing per node |
 
-> **Q29 trap**: ALL four are required: metadata + inputs + **outputs** + environment. The wrong answer was missing outputs.
-
-**MS Learn**: [Run pipelines in Azure Machine Learning](https://learn.microsoft.com/training/modules/run-pipelines-azure-machine-learning/)
+### MS Learn for this section:
+- [Run pipelines in Azure Machine Learning](https://learn.microsoft.com/training/modules/run-pipelines-azure-machine-learning/)
+- [Deploy a model to a managed online endpoint](https://learn.microsoft.com/training/modules/deploy-model-managed-online-endpoint/)
+- [Deploy batch inference pipelines](https://learn.microsoft.com/training/modules/deploy-batch-inference-pipelines-with-azure-machine-learning/)
+- [Run a training script as a command job](https://learn.microsoft.com/training/modules/run-training-script-command-job-azure-machine-learning/)
 
 ---
 
-## SECTION 7: Deployment — Scoring Scripts & Classes
-
-You missed: **Q33** (init vs main for batch), **Q34** (run method for feature engineering), **Q36** (ManagedOnlineDeployment vs OnlineEndpoint)
-
-### Scoring Script Functions
-
-| Function | When called | Purpose |
-|---|---|---|
-| `init()` | **Once** at deployment start | Load model into memory |
-| `run(data)` | **Each request** (online) or **each mini-batch** (batch) | Process data, return predictions |
-
-> **Q33 trap**: `init()` loads the model, not `main()`. `main()` is for running Python scripts directly, not for scoring scripts.
-
-> **Q34 trap**: Feature engineering on incoming data goes in `run()` because it's called for EVERY request. `init()` only runs once at startup.
-
-### Deployment Classes Decision Table
-
-| I want to... | Class | What it creates |
-|---|---|---|
-| Define the endpoint URL + auth | `ManagedOnlineEndpoint` | The URL/entry point |
-| Define model + VM + environment + scoring script | `ManagedOnlineDeployment` | The actual deployment behind the endpoint |
-| Invoke/test the endpoint | `ml_client.online_endpoints.invoke()` | N/A |
-| Delete everything | `ml_client.online_endpoints.begin_delete()` | N/A |
-
-> **Q36 trap**: The question asked for "name, instance_type, environment, code_configuration" → these are DEPLOYMENT properties, not endpoint properties. Answer: `ManagedOnlineDeployment`.
-
-### Endpoint vs Deployment — The Difference
-
-```
-Endpoint (ManagedOnlineEndpoint)     Deployment (ManagedOnlineDeployment)
-├── name: "my-endpoint"              ├── name: "blue"
-├── auth_mode: "key"                 ├── model: "azureml:my-model:1"
-└── traffic: {"blue": 90, "green": 10}  ├── instance_type: "Standard_DS3_v2"
-                                     ├── instance_count: 1
-                                     ├── environment: "azureml:my-env:1"
-                                     └── scoring_script: "score.py"
-```
-
-**MS Learn**: [Deploy a model to a managed online endpoint](https://learn.microsoft.com/training/modules/deploy-model-managed-online-endpoint/)
-
----
-
-## SECTION 8: Prompt Flow — Nodes, Variants, YAML
-
-You missed: **Q39** (tool node), **Q42** (flow.dag.yaml), **Q43** (variant)
+## AREA 4: Optimize Language Models for AI Applications
 
 ### Prompt Flow Node Types
 
 | Node Type | Purpose | Example |
 |---|---|---|
-| **Prompt** node | Define LLM instructions, system messages | "Summarize this article in 3 bullet points" |
-| **Tool** node | Data processing, task execution, algorithms | Python script to parse JSON, call API |
-| **LLM** node | Send prompts to a language model | Call GPT-4 with a constructed prompt |
+| **Prompt** | Instructions/system messages for the LLM | "Summarize in 3 bullets" |
+| **Tool** | Data processing, task execution, API calls | Python script to parse JSON |
+| **LLM** | Send prompts to a language model | Call GPT-4 |
 
-> **Q39 trap**: "handles data processing, task execution, algorithmic operations" → that's a **Tool** node, not a chain or prompt.
+> "Data processing + task execution + algorithms" → **Tool** node.
 
-### Prompt Flow Files
+### Prompt Flow Key Files
 
-| File | Purpose |
+| File | What it does |
 |---|---|
-| `flow.dag.yaml` | **Defines the flow structure** — nodes, connections, chaining logic |
+| `flow.dag.yaml` | Defines flow structure + chaining logic between nodes |
 | `flow.meta.yaml` | Flow metadata (name, description) |
-| `inputs.json` | Test input data for the flow |
-| `outputs.json` | Captured outputs from flow runs |
+| `inputs.json` | Test input data |
+| `outputs.json` | Captured output data |
 
-> **Q42 trap**: Chaining logic (output of node A → input of node B) is defined in `flow.dag.yaml`, NOT in inputs.json.
+> "Chaining logic" (output A → input B) → defined in `flow.dag.yaml`.
 
-### Variants
+### Prompt Flow Concepts
 
-A **variant** is a different version of a prompt node, used to compare which prompt produces better results.
-
-| Concept | What it is |
+| Term | What it is |
 |---|---|
-| **Variant** | Different prompt configuration to A/B test |
-| **Sample** | A single test input/case |
+| **Variant** | Different version of a prompt to A/B test and compare metrics |
+| **Sample** | A single test input case |
 | **Dataset** | Collection of test inputs |
 | **Endpoint** | Deployed flow for production |
 
-> **Q43 trap**: To COMPARE metrics across different prompts → create **variants**. A sample is just one test case.
-
-**MS Learn**: [Prompt flow in Azure AI Foundry](https://learn.microsoft.com/training/modules/create-manage-prompt-flow/)
-
----
-
-## SECTION 9: Azure AI Search — Indexers & Knowledge Stores
-
-You missed: **Q44** (knowledge store in indexer), **Q45** (enrichment pipeline in indexer)
+> "Compare different prompts side by side" → create **variants**.
 
 ### Azure AI Search Architecture
 
 ```
-Data Source → Indexer → Skillset (AI enrichment) → Index (searchable)
+Data Source → Indexer → Skillset → Index (searchable)
                  │
-                 └→ Knowledge Store (tables, JSON, images in Azure Storage)
+                 └→ Knowledge Store (Azure Storage)
 ```
 
-### What Goes Where
+**Creation order**: Data source → Skillset → Index → Indexer (always last)
 
-| Component | Configured in | Purpose |
-|---|---|---|
-| Data source | Standalone resource | Points to Blob/SQL/etc. |
-| Skillset | Standalone resource | AI enrichment steps (NER, sentiment, etc.) |
-| Index | Standalone resource | Searchable fields |
-| Knowledge store | **In the indexer** | Persist enriched data to Azure Storage |
-| Enrichment pipeline | **In the indexer** | Chain skillsets to process documents |
+| What | Configured where |
+|---|---|
+| Knowledge store persistence | **In the indexer** |
+| AI enrichment (NER, sentiment, etc.) | **Enrichment pipeline in the indexer** |
+| Searchable fields | In the index |
 
-> **Q44 trap**: Knowledge store is configured in the **indexer**, NOT in the search service or the index.
-> **Q45 trap**: To add AI enrichment (like Text Analytics for health), configure an **enrichment pipeline in the indexer** with the skill and output to the same index.
+> Knowledge store and enrichment pipeline are BOTH configured in the **indexer**, not in the search service or index.
 
-### Resource Creation Order
+### Evaluation Metrics for LLM Flows
 
-```
-1. Data source (where's the data?)
-2. Skillset (how to enrich it?)
-3. Index (what fields to search?)
-4. Indexer (connect everything, run it)
-```
+| Metric | Measures |
+|---|---|
+| **Fluency** | Grammar, spelling, readability |
+| **Groundedness** | Is the output supported by source evidence? |
+| **Relevance** | Does the output address the user's question? |
+| **Similarity** | How close is output to a reference answer? |
+| **Coherence** | Does the output flow logically? |
 
-> The indexer is ALWAYS last because it orchestrates everything else.
+> Misspellings + bad grammar → evaluate **fluency**.
 
-**MS Learn**: [Create a knowledge mining solution with Azure AI Search](https://learn.microsoft.com/training/modules/create-enrichment-pipeline-azure-cognitive-search/)
-
----
-
-## MASTER DECISION TABLE — "If the question says X, the answer is Y"
-
-| Question pattern | Wrong answer you picked | Correct answer | Why |
-|---|---|---|---|
-| "Reference to data with metadata, no copy" | Pipeline | **Data asset (dataset)** | Dataset = pointer + metadata |
-| "MLflow track LOCAL experiments, what FIRST?" | Start training | **Set tracking URI** | Local needs URI; jobs don't |
-| "Cluster with 4 instances" | ComputeInstance | **AmlCompute** | ComputeInstance = always 1 node |
-| "Retrieve run metrics with MlflowClient" | log_artifact() | **get_run()** | log = write; get = read |
-| "Large search space, fast, minimize time" | Grid | **Random** | Grid = exhaustive = slowest |
-| "Continuous hyperparameter distribution" | QLogNormal | **Normal** | Q prefix = discrete |
-| "Run training script with SDK v2" | Environment | **command()** | Environment = packages; command = execution |
-| "Monitor pipeline after submit" | Authoring page | **Jobs → submission list** | Authoring page has no status |
-| "Pass data between pipeline steps (v1)" | Missing OutputFileDatasetConfig | **Define OutputFileDatasetConfig first** | Must create intermediate data object |
-| "Every Wednesday at 1:15 PM cron" | `15 13 * * *` | **`15 13 * * 3`** | Wed = 3 (0=Sun) |
-| "Component YAML required sections" | Without outputs | **metadata + inputs + outputs + env** | ALL four needed |
-| "Load model in batch scoring script" | main | **init()** | init = load model; run = score |
-| "Feature engineering on incoming data" | Connect to workspace | **Update run() method** | run() processes each request |
-| "Endpoint name, instance_type, env, code" | OnlineEndpoint | **ManagedOnlineDeployment** | These are deployment properties |
-| "Node for data processing/task execution" | Chain nodes | **Configure as tool node** | Tool = processing; Prompt = LLM instructions |
-| "Where is chaining logic defined?" | inputs.json | **flow.dag.yaml** | DAG file = flow structure |
-| "Compare metrics across prompts" | Sample | **Variant** | Variant = A/B test prompts |
-| "Where to configure knowledge store?" | Search service | **In the indexer** | Indexer orchestrates persistence |
-| "Add AI enrichment to search index" | Call API at query time | **Enrichment pipeline in indexer** | Indexer applies skills and populates index |
+### MS Learn for this section:
+- [Prompt flow in Azure AI Foundry](https://learn.microsoft.com/training/modules/create-manage-prompt-flow/)
+- [Azure AI Search (knowledge mining)](https://learn.microsoft.com/training/modules/create-enrichment-pipeline-azure-cognitive-search/)
+- [Fine-tune Azure OpenAI models](https://learn.microsoft.com/training/modules/fine-tune-azure-openai/)
+- [Deploy models as serverless APIs](https://learn.microsoft.com/training/modules/deploy-models-serverless-api/)
